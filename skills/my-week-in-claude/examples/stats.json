@@ -1,0 +1,117 @@
+{
+ "since": "2026-11-12",
+ "until": "2026-11-19",
+ "sessions": 24,
+ "messages_sent": 312,
+ "messages_received": 1402,
+ "tokens": 1000000000,
+ "places": [
+  {
+   "key": "code",
+   "label": "code",
+   "tokens": 400000000,
+   "share": 40
+  },
+  {
+   "key": "documents",
+   "label": "documents",
+   "tokens": 60000000,
+   "share": 6
+  },
+  {
+   "key": "answer",
+   "label": "answer",
+   "tokens": 210000000,
+   "share": 21
+  },
+  {
+   "key": "Notion",
+   "label": "Notion",
+   "tokens": 130000000,
+   "share": 13
+  },
+  {
+   "key": "Linear",
+   "label": "Linear",
+   "tokens": 80000000,
+   "share": 8
+  },
+  {
+   "key": "Figma",
+   "label": "Figma",
+   "tokens": 70000000,
+   "share": 7
+  },
+  {
+   "key": "pages",
+   "label": "pages",
+   "tokens": 30000000,
+   "share": 3
+  }
+ ],
+ "new_this_week": [
+  {
+   "item": "Skill: release-notes",
+   "example": "can you turn everything merged this week into release notes for customers?"
+  },
+  {
+   "item": "Connector: Google Calendar",
+   "example": "check my calendar for tomorrow and give me a one-line brief for each meeting"
+  },
+  {
+   "item": "Feature: Publishing plugins",
+   "example": "can you turn these skills into a plugin and publish it to [my company's] org\u2026 make sure it's the latest version"
+  }
+ ],
+ "used_ever": [],
+ "most_agents_at_once": 10,
+ "most_agents_example": "get 10 agents to find out why the nightly build keeps failing",
+ "logs_start": "2026-07-07",
+ "models": {
+  "main": {
+   "share": 64,
+   "rows": [
+    {
+     "model": "Opus 5.5",
+     "effort": "high",
+     "share": 31
+    },
+    {
+     "model": "Opus 5.5",
+     "effort": "medium",
+     "share": 24
+    },
+    {
+     "model": "Fable 5.2",
+     "effort": "high",
+     "share": 9
+    }
+   ]
+  },
+  "sub": {
+   "share": 36,
+   "rows": [
+    {
+     "model": "Sonnet 5.5",
+     "effort": "low",
+     "share": 17
+    },
+    {
+     "model": "Opus 5.5",
+     "effort": "low",
+     "share": 12
+    },
+    {
+     "model": "Sonnet 5.5",
+     "effort": "medium",
+     "share": 5
+    },
+    {
+     "model": "Fable 5.2",
+     "effort": "high",
+     "share": 2
+    }
+   ]
+  }
+ }
+}
