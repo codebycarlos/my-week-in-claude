@@ -1,0 +1,11 @@
+[
+{"id": 0, "place": "code", "tokens": 400000000},
+{"id": 1, "place": "documents", "tokens": 60000000},
+{"id": 2, "place": "answer", "tokens": 190000000},
+{"id": 3, "place": "Notion", "tokens": 130000000},
+{"id": 4, "place": "Linear", "tokens": 80000000},
+{"id": 5, "place": "Figma", "tokens": 70000000},
+{"id": 6, "place": "pages", "tokens": 30000000},
+{"id": 7, "place": "answer", "tokens": 12000000},
+{"id": 8, "place": "answer", "tokens": 8000000}
+]
