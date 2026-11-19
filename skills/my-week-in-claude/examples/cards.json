@@ -1,0 +1,230 @@
+{
+  "name": "Jordan Lee",
+  "persona": {
+    "name": "The Ringleader",
+    "line": "Over a third of your week was subagents working for you. Delegation isn't a skill, it's a lifestyle."
+  },
+  "firsts": [
+    {
+      "kind": "New skill",
+      "name": "release-notes",
+      "detail": "Writes customer release notes from the week's merged pull requests",
+      "example": "can you turn everything merged this week into release notes for customers? Plain words, no ticket numbers"
+    },
+    {
+      "kind": "New connector",
+      "name": "Google Calendar",
+      "detail": "Lets Claude read the calendar to plan and prepare for meetings",
+      "example": "check my calendar for tomorrow and give me a one-line brief for each meeting"
+    },
+    {
+      "kind": "First time",
+      "name": "Published a plugin",
+      "detail": "Packages skills as a plugin colleagues can install in one click",
+      "example": "can you turn these skills into a plugin and publish it to [my company's] org… make sure it's the latest version"
+    },
+    {
+      "kind": "Personal best",
+      "name": "10 agents at once",
+      "detail": "The most subagents started in one go, for the build research below"
+    }
+  ],
+  "cards": [
+    {
+      "title": "Drafting code changes and pull requests on GitHub",
+      "places": [
+        "code",
+        "documents"
+      ],
+      "moved": [],
+      "examples": [
+        {
+          "text": "this change touches billing, which makes me nervous… can you get 5 agents to review it from different angles before I open the PR?",
+          "apps": [
+            "GitHub"
+          ]
+        },
+        {
+          "text": "[a colleague] says the nightly build keeps failing… get 10 agents to find out why → put what they found in a spreadsheet, one tab per failing job, with a link to each run",
+          "apps": [
+            "GitHub",
+            "Google Sheets"
+          ]
+        },
+        {
+          "text": "this PR is too big to review… split it into 3 smaller ones that each make sense on their own, and update the ticket",
+          "apps": [
+            "GitHub",
+            "Linear"
+          ]
+        },
+        {
+          "text": "add short comments to the PR explaining each file, for someone who has never seen this part of the code",
+          "apps": [
+            "GitHub"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Looking into things and answering questions",
+      "places": [
+        "answer"
+      ],
+      "moved": [],
+      "examples": [
+        {
+          "text": "I've been in meetings all morning… catch me up on where we are, what's done and what's left",
+          "apps": [
+            "Linear",
+            "Notion",
+            "GitHub"
+          ]
+        },
+        {
+          "text": "something doesn't add up… if this bug were real we'd have far more support tickets. Get 5 agents to check all the evidence so far",
+          "apps": [
+            "Intercom",
+            "Slack",
+            "Mixpanel",
+            "GitHub"
+          ]
+        },
+        {
+          "text": "find everything we've written about onboarding in Notion and Slack, look at what other companies do, then tell me how we could make our guide better",
+          "apps": [
+            "Web",
+            "Notion",
+            "Slack"
+          ]
+        },
+        {
+          "text": "can you pull sign-ups by week from Mixpanel and tell me whether the new landing page made a difference?",
+          "apps": [
+            "Mixpanel"
+          ]
+        },
+        {
+          "text": "[a customer] says the sign-up button does nothing on their phone… can you check it in the browser at phone size?",
+          "apps": [
+            "Google Chrome"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Drafting Notion pages",
+      "places": [
+        "Notion"
+      ],
+      "moved": [],
+      "examples": [
+        {
+          "text": "here's the transcript from our planning meeting, turn it into a page with the decisions, who owns what and the open questions",
+          "apps": [
+            "Notion"
+          ]
+        },
+        {
+          "text": "write up the outage: timeline first, then what we'd do differently, in the same format as the last one",
+          "apps": [
+            "Notion",
+            "Datadog",
+            "GitHub"
+          ]
+        },
+        {
+          "text": "rank each feature by how many competitors have it, as a percentage, so the gaps everyone else has filled show first",
+          "apps": [
+            "Notion",
+            "Web"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Drafting tickets in Linear",
+      "places": [
+        "Linear"
+      ],
+      "moved": [],
+      "examples": [
+        {
+          "text": "we agreed on options 1 and 3 in the meeting… write them up as tickets with simple test steps, and link each one to the design",
+          "apps": [
+            "Linear",
+            "Notion",
+            "Figma"
+          ]
+        },
+        {
+          "text": "[a colleague] suggested we check this automatically on every release… is it ticketed already? If not, write one",
+          "apps": [
+            "Linear",
+            "Slack"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Mocking up screens from Figma designs",
+      "places": [
+        "Figma",
+        "pages"
+      ],
+      "moved": [],
+      "examples": [
+        {
+          "text": "get 3 agents to mock up the new settings page and 2 to review their work, back and forth until it matches the Figma",
+          "apps": [
+            "Figma",
+            "Claude"
+          ]
+        },
+        {
+          "text": "[the designer] updated the designs, pull the latest from Figma and update your mock",
+          "apps": [
+            "Figma"
+          ]
+        },
+        {
+          "text": "I want one board per step of the sign-up flow, on mobile and desktop",
+          "apps": [
+            "Figma",
+            "Notion"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Drafting Slack messages",
+      "places": [],
+      "moved": [
+        7,
+        8
+      ],
+      "examples": [
+        {
+          "text": "write a short update for the team channel for anyone who missed the outage call",
+          "apps": [
+            "Slack",
+            "Notion"
+          ]
+        },
+        {
+          "text": "turn this into bullet points… who else should we thank?",
+          "apps": [
+            "Slack",
+            "Linear"
+          ]
+        },
+        {
+          "text": "draft a message announcing the new dashboard… make it sound friendly, not like a press release",
+          "apps": [
+            "Slack"
+          ]
+        }
+      ]
+    }
+  ]
+}

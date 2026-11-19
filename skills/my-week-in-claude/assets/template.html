@@ -1,0 +1,46 @@
+<!doctype html><html><head><meta charset=utf-8>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#141413;font-family:Lora,Georgia,serif;color:#141413}
+.w{width:900px;background:#faf9f5}
+.head{background:#141413;color:#faf9f5;padding:30px 40px 28px;position:relative;overflow:hidden}
+.brand{display:flex;align-items:center;justify-content:space-between;font-family:Poppins,sans-serif;font-size:14px;color:#b0aea5;margin-bottom:18px;position:relative}
+.brand .bl{display:flex;align-items:center;gap:8px;font-weight:600;color:#faf9f5;font-size:16px}
+.brand .bl svg{width:22px;height:22px}
+h1{font-family:Poppins,sans-serif;font-weight:700;font-size:38px;margin:0;line-height:1.1;color:#faf9f5;position:relative}
+.persona{margin:10px 0 10px;font-size:17px;line-height:1.45;position:relative}.pn{font-family:Poppins,sans-serif;font-weight:600;color:#d97757;margin-right:8px}.pl{color:#e8e6dc;font-style:italic}
+.sub{color:#b0aea5;font-size:14px;font-family:Poppins,sans-serif;position:relative}
+.body{padding:24px 40px 28px}
+.mh{font-family:Poppins,sans-serif;font-weight:600;font-size:16px;margin-bottom:10px;color:#141413}.mh span{font-weight:400;font-size:14px;color:#78766e;margin-left:6px}
+.firsts{background:#f0eee6;border-radius:14px;padding:16px 20px 12px;margin-bottom:18px}
+.firsts{padding-bottom:16px}
+.tail{background:#141413;color:#faf9f5;padding:24px 40px 22px}
+.tail .mh{color:#faf9f5}.tail .mh span{color:#b0aea5}
+.mcols{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.mt{display:flex;justify-content:space-between;align-items:baseline;font-family:Poppins,sans-serif;font-size:14px;color:#b0aea5;border-bottom:1px solid #3a3935;padding-bottom:6px;margin-bottom:6px}
+.mt b{font-size:22px;font-weight:600;color:#d97757}
+.ml{display:grid;grid-template-columns:1fr 1fr;column-gap:20px;row-gap:3px}
+.mi{display:flex;justify-content:space-between;font-size:14.5px}.mi i{color:#b0aea5}.mi b{font-family:Poppins,sans-serif;font-weight:600;font-variant-numeric:tabular-nums}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.first{background:#faf9f5;border-radius:10px;padding:11px 14px}
+.fk{font-family:Poppins,sans-serif;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#c4613f}
+.fn{font-family:Poppins,sans-serif;font-size:15px;font-weight:600;margin-top:2px}.fd{font-size:14px;color:#4a4943;line-height:1.4;margin-top:3px}
+.card{background:#f0eee6;border-radius:14px;padding:16px 20px 12px;margin-bottom:12px}
+.top{display:flex;justify-content:space-between;align-items:baseline}.name{font-family:Poppins,sans-serif;font-weight:600;font-size:18px}.nums{font-family:Poppins,sans-serif;font-size:18px;color:#c4613f;font-variant-numeric:tabular-nums}
+.track{background:#e2dfd3;border-radius:999px;height:10px;margin:10px 0 8px}
+.bar{height:10px;background:#d97757;border-radius:999px}
+ul{margin:6px 0 4px;padding-left:18px;color:#3d3c37;font-size:15px;line-height:1.5}li{margin-bottom:3px}.via{display:inline-flex;gap:4px;vertical-align:-3px;margin-left:7px;background:#faf9f5;border-radius:999px;padding:2px 7px}.via svg{width:14px;height:14px}li::marker{color:#d97757}
+.apps{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 2px}.app{display:inline-flex;align-items:center;gap:6px;font-family:Poppins,sans-serif;font-size:13px;background:#faf9f5;border-radius:999px;padding:3px 11px 3px 8px}
+.foot{font-family:Poppins,sans-serif;font-size:13px;color:#b0aea5;text-align:center;margin-top:20px;padding-top:14px;border-top:1px solid #3a3935}.note{font-style:italic;font-size:14.5px;line-height:1.45;color:#4a4943;text-align:center;margin:16px 30px 0}
+</style><style>.fgrid{display:block!important}.first{display:grid!important;grid-template-columns:190px 1fr;column-gap:20px;align-items:start;margin:0 0 8px!important}.first:last-child{margin-bottom:0!important}.fr .fd{margin-top:0}.fq{font-style:italic;font-size:13.5px;line-height:1.45;margin-top:3px;opacity:.85;border:0!important;padding:0!important}</style></head><body><div class=w id=w>
+<div class=head><div class=brand><span class=bl>{logo}{title}</span><span>{span}</span></div>
+{name}
+{persona}
+<div class=sub>{sub}</div></div>
+<div class=body>
+{firsts}
+{cards}
+<div class=note>{note}</div>
+</div><div class=tail>{models}
+<div class=foot>{footer}</div></div>
+</div><script>document.title=document.getElementById('w').offsetHeight;document.fonts.ready.then(function(){document.title=document.getElementById('w').offsetHeight})</script></body></html>
