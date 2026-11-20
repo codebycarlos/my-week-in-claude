@@ -46,15 +46,19 @@ the my-week-in-claude plugin.
 - **Models and thinking level.** Your share of each, in your sessions and in subagents.
 - **Five ideas.** Claude also suggests five ways to work better, based on your week:
   a skill for something you keep repeating, a connector you have but don't use, and so on.
-- **A final check, in edit mode.** Claude opens the card in your browser. Flick between personas, vote on
-  them or ask for more, or turn the persona off. Give each prompt a thumbs up or down, leave Claude a
-  note on it, ask for one to be anonymised further, remove or add prompts, or hide a whole section. Go back to any earlier
-  version, or slide between two to see what changed. Claude makes the changes and draws the card
-  again.
+- **An optional final check, in edit mode.** Claude opens the card in your browser. Vote on prompts
+  and personas, leave notes, add, remove or hide, and compare versions with a slider. Close it or
+  ignore it and your card stays as it is.
 
 ## How it works
 
 ![The seven steps: welcome, measure, pick and redact the examples, pick a persona, render, five ideas, final check](images/how-it-works.png)
+
+The last step opens edit mode in your browser. The image and the PDF are already saved by then, so
+you can use it, close it or ignore it. Each new version highlights what changed, and says which of
+your feedback it answers.
+
+![Edit mode: a persona with arrows and votes, sections with a thumbs up, a thumbs down, anonymise, note and remove beside each prompt, and green tags such as "Swapped, as you asked"](images/edit-mode.png)
 
 ## Privacy
 
