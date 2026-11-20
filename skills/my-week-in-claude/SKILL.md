@@ -35,7 +35,7 @@ question, copied exactly.
 > copy, plus five ideas for working better that stay in this chat. I read your week from the
 > session logs on this machine, take out names and private details, and follow any AI policy that
 > applies to you. Nothing is posted anywhere. It takes 5 to 15 minutes, and uses about as many
-> tokens as a longish conversation. (v1.0.13)
+> tokens as a longish conversation. (v1.0.14)
 
 The options are "Start" and "Not now". Wait for "Start" before anything else, the checks below
 included.
@@ -56,7 +56,9 @@ the package manager on Linux). If they would rather not, stop and say what they 
 ## Keep them posted
 
 If you keep a task list, name its steps by this file's headings, such as "Get everything set up"
-and "Check relevant AI policies", and never assume the person works for a company.
+and "Check relevant AI policies", and never assume the person works for a company. Mark a step in
+progress when it starts and done when it finishes. The policy check starts together with
+measuring, so both are in progress at once.
 
 Before each step from here on, give the person one short, light line saying what you are doing,
 so the wait feels like part of the fun. Write your own each time, in the spirit of these:
@@ -81,8 +83,9 @@ each, and nothing that reveals a prompt before the final check.
 
 ## 1. Measure
 
-Work in parallel where you can. Start a subagent on "Check relevant AI policies" under step 2 as
-you run the command below, and use what it finds when you pick the examples.
+Work in parallel where you can. As you run this command, start a subagent on "Check relevant AI
+policies", the section after it. Wait for its report before step 2, and mark the policy check done
+when it arrives.
 
 ```sh
 python3 "${CLAUDE_SKILL_DIR}/scripts/collect.py" --session ${CLAUDE_SESSION_ID} --out <work dir>
@@ -107,6 +110,24 @@ are `code` (code committed, pushed or edited), `documents` (documents, sheets, i
 files written), `pages` (pages and mock-ups published) and `answer`, where Claude looked things up
 or ran checks and wrote nowhere but the chat. A bare go-ahead's work counts towards the prompt
 before it. `--cowork <folder>` points at Cowork's sessions if they are somewhere unusual.
+
+### Check relevant AI policies
+
+Look for any AI policy that applies to the person, and apply it to everything on the image in
+step 2. Search the document apps you
+can reach (Notion, Confluence, Google Drive, SharePoint) for "AI policy" or "AI use", and read
+what you find, pages it links to included. Keep the title and link of each policy you check the
+prompts against. If you find none, carry on without one and warn the person at the end.
+
+Leave out any prompt that shows a use the policy rules out or limits, such as:
+
+- customer content, personal or health data, or confidential figures given to Claude
+- secrets or security findings pasted in
+- an AI tool the policy has not approved
+
+Follow the policy's rules on what may be shared, too. In step 6, show the prompts you left out
+for the policy in a table, one row each: what the prompt was about, and why the policy rules it
+out, naming the rule.
 
 ## 2. Write and redact the cards
 
@@ -166,24 +187,6 @@ eclectic.").
   their week, and ends on a compliment or a dry second beat.
 - Tease the habit, never the person, and never how much they used.
 - Write three for step 3, each built on a different habit.
-
-### Check relevant AI policies
-
-Look for any AI policy that applies to the person before you pick examples, and apply it to everything on
-the image. Search the document apps you
-can reach (Notion, Confluence, Google Drive, SharePoint) for "AI policy" or "AI use", and read
-what you find, pages it links to included. Keep the title and link of each policy you check the
-prompts against. If you find none, carry on without one and warn the person at the end.
-
-Leave out any prompt that shows a use the policy rules out or limits, such as:
-
-- customer content, personal or health data, or confidential figures given to Claude
-- secrets or security findings pasted in
-- an AI tool the policy has not approved
-
-Follow the policy's rules on what may be shared, too. In step 6, show the prompts you left out
-for the policy in a table, one row each: what the prompt was about, and why the policy rules it
-out, naming the rule.
 
 ### Redact
 

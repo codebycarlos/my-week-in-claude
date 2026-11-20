@@ -1,5 +1,5 @@
 {
   "name": "my-week-in-claude",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "Spotify Wrapped for Claude. Your week as a shareable image and PDF, with real prompts from each kind of work, anonymised and cleaned of anything private."
 }
