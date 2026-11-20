@@ -149,6 +149,17 @@ def signals(sig, text):
     if len(words) >= 5: sig["openings"][" ".join(words[:5])] += 1
 
 
+def running_session(root):
+    """The session whose log ends with the command that started this script."""
+    logs = sorted(glob.glob(os.path.join(root, "*", "*.jsonl")), key=os.path.getmtime, reverse=True)[:20]
+    for log in logs:
+        with open(log, "rb") as f:
+            f.seek(max(0, os.path.getsize(log) - 200_000))
+            if b"scripts/collect.py" in f.read():
+                return os.path.splitext(os.path.basename(log))[0]
+    return None
+
+
 def accounts(cowork_root):
     """Each signed-in account's sessions, as {account id: [email, session ids]}, from every config folder and the desktop app."""
     acc = {}
@@ -189,7 +200,7 @@ def main():
         os.path.join(os.environ.get("APPDATA") or os.path.expanduser("~/AppData/Roaming"), "Claude", "local-agent-mode-sessions") if os.name == "nt" else
         "~/.config/Claude/local-agent-mode-sessions"), help="Cowork's session folder")
     ap.add_argument("--history", help="history.jsonl of one account, to count only that account's sessions")
-    ap.add_argument("--session", help="this conversation's session id, to leave out other accounts' sessions")
+    ap.add_argument("--session", nargs="?", help="this conversation's session id, to leave out other accounts' sessions")
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
 
@@ -197,6 +208,9 @@ def main():
     since = (until - dt.timedelta(days=a.days)).replace(hour=0, minute=0, second=0, microsecond=0)
     since_s = since.astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
     only = None; others = set()
+    root = os.path.normpath(a.projects)
+    if not a.session or a.session.startswith("$"):
+        a.session = running_session(root)
     if a.history:
         only = set()
         for line in open(a.history, encoding="utf-8", errors="ignore"):
@@ -209,7 +223,6 @@ def main():
             others = set().union(*(v[1] for v in acc.values() if v is not mine)) - mine[1]
             print(f"Leaving out sessions from accounts other than {mine[0]}, the one this conversation runs in.")
 
-    root = os.path.normpath(a.projects)
     skill_dirs = [os.path.join(os.path.dirname(root), "skills"), os.path.expanduser("~/.claude/skills")]
     seen = set()
     total = 0

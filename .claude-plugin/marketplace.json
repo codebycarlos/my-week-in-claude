@@ -5,7 +5,7 @@
     {
       "name": "my-week-in-claude",
       "source": "./",
-      "description": "Spotify Wrapped for Claude. Your week as a shareable image and PDF, with real prompts from each kind of work, anonymised and cleaned of anything private."
+      "description": "Spotify Wrapped for Claude. Your week as one shareable card, with real prompts from each kind of work, anonymised and cleaned of anything private."
     }
   ]
 }

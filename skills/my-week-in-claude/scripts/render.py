@@ -201,13 +201,17 @@ def main():
                   + (f"<div class=fq>“{html.escape(x['example'])}”</div>" if x.get("example") else "") + "</div></div>")
     firsts_html = f"<div class=firsts><div class=mh>New this week</div><div class=fgrid>{items}</div></div>" if items else ""
     logo = re.search(r' d="([^"]+)"', open(os.path.join(ICONS, "claude.svg"), encoding="utf-8").read()).group(1)
-    footer = c.get("footer", "See your week: ask Claude “Install the my-week-in-claude plugin and show me my week in Claude”")
+    footer = c.get("footer", ["See your week in Claude Code:", "1. Ask “Install the my-week-in-claude plugin”",
+                              "2. Start a new session", "3. Ask “Show me my week in Claude”"])
+    footer = [footer] if isinstance(footer, str) else footer
+    footer = (f'<div style="margin-bottom:4px">{html.escape(footer[0])}</div>' + "".join(
+        f'<span style="display:inline-block;white-space:nowrap;margin:0 9px">{html.escape(x)}</span>' for x in footer[1:]))
     page = open(a.template, encoding="utf-8").read()
     for k, v in {"{name}": f"<h1>{html.escape(short_name(c['name']))}</h1>" if c.get("name") else "",
                  "{logo}": f'<svg viewBox="0 0 24 24" width=20 height=20 fill="#D97757"><path d="{logo}"/></svg>',
                  "{title}": html.escape(c.get("title", "My week in Claude")),
                  "{sub}": sub, "{span}": span(s['since'], s['until']), "{persona}": persona_html, "{firsts}": firsts_html,
-                 "{footer}": html.escape(footer), "{note}": html.escape(c.get("note", NOTE)), "{models}": models_html(s["models"]), "{cards}": cards}.items():
+                 "{footer}": footer, "{note}": html.escape(c.get("note", NOTE)), "{models}": models_html(s["models"]), "{cards}": cards}.items():
         page = page.replace(k, v)
 
     os.makedirs(folder, exist_ok=True)

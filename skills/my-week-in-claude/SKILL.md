@@ -35,7 +35,7 @@ question, copied exactly.
 > copy, plus five ideas for working better that stay in this chat. I read your week from the
 > session logs on this machine, take out names and private details, and follow any AI policy that
 > applies to you. Nothing is posted anywhere. It takes about 5 minutes, and uses about as many
-> tokens as a longish conversation. (v1.0.15)
+> tokens as a longish conversation. (v1.0.16)
 
 The options are "Start" and "Not now". Wait for "Start" before anything else, the checks below
 included.
@@ -79,7 +79,9 @@ each, and nothing that reveals a prompt before the final check.
   folder a new temporary folder (`python3 -c "import tempfile; print(tempfile.mkdtemp())"`),
   never inside a project or a synced folder, and delete it once the person is happy with the
   image, without mentioning it.
-- **Run the scripts from this skill's folder.** That is `${CLAUDE_SKILL_DIR}`.
+- **Run the scripts from this skill's folder.** That is `${CLAUDE_SKILL_DIR}`. If you read this
+  file straight from disk and that shows as written, it is the folder holding this file, and
+  `collect.py` works out the session itself when `--session` is left out.
 
 ## 1. Measure
 
