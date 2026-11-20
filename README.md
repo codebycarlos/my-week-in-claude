@@ -39,15 +39,18 @@ the my-week-in-claude plugin.
 
 - **A card, as an image and a PDF.** Both are saved in a new folder in `Downloads/my-week-in-claude`.
   The image shows up in a post or a message; in the PDF, readers can select and copy your prompts.
-- **A persona.** Claude writes three, based on how you worked, and you pick one.
+- **A persona.** Claude writes three, based on how you worked, and you pick one or go without.
 - **New this week.** Skills, connectors and features you used for the first time.
 - **A section per kind of work.** Its share of the week, the apps it touched, and your own prompts,
   most reusable first.
 - **Models and thinking level.** Your share of each, in your sessions and in subagents.
 - **Five ideas.** Claude also suggests five ways to work better, based on your week:
   a skill for something you keep repeating, a connector you have but don't use, and so on.
-- **A final check.** Claude shows every prompt it is about to share and asks whether you're happy with it.
-  Take out a prompt you'd rather not share, swap one or rename a section, and it draws the card again.
+- **A final check, in edit mode.** Claude opens the card in your browser. Flick between personas, vote on
+  them or ask for more, or turn the persona off. Give each prompt a thumbs up or down, leave Claude a
+  note on it, ask for one to be anonymised further, remove or add prompts, or hide a whole section. Go back to any earlier
+  version, or slide between two to see what changed. Claude makes the changes and draws the card
+  again.
 
 ## How it works
 

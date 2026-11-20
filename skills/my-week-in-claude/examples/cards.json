@@ -1,8 +1,22 @@
 {
   "name": "Jordan Lee",
+  "personas": [
+    {
+      "name": "The Incident Commander",
+      "line": "Ten agents on a failing build. Five on a bug that might not exist. The entire commit history on tabs versus spaces."
+    },
+    {
+      "name": "The Second Opinion",
+      "line": "Before opening your own pull request, you had five agents review it from different angles."
+    },
+    {
+      "name": "The Slicer",
+      "line": "You split one PR into three, the sign-up flow into a board per step, then every feature into a percentage."
+    }
+  ],
   "persona": {
-    "name": "The Ringleader",
-    "line": "Over a third of your week was subagents working for you. Delegation isn't a skill, it's a lifestyle."
+    "name": "The Incident Commander",
+    "line": "Ten agents on a failing build. Five on a bug that might not exist. The entire commit history on tabs versus spaces."
   },
   "firsts": [
     {
@@ -108,6 +122,12 @@
           "text": "[a customer] says the sign-up button does nothing on their phone… can you check it in the browser at phone size?",
           "apps": [
             "Google Chrome"
+          ]
+        },
+        {
+          "text": "[a colleague] and I disagree on whether tabs or spaces cause more of our merge conflicts… check the history and settle it",
+          "apps": [
+            "GitHub"
           ]
         }
       ]

@@ -75,12 +75,12 @@ def icon(app):
     return f"<span class=app>{svg}{html.escape(app['name'])}</span>"
 
 
-def example(q):
+def example(q, i):
     """One quote, with small logos of the apps its work drew on."""
     q = {"text": q} if isinstance(q, str) else q
     names = [x if isinstance(x, str) else x["name"] for x in q.get("apps", [])]
     via = "".join(f'<span title="{html.escape(n)}">{find_icon(n)}</span>' for n in names)
-    return f"<li>“{html.escape(q['text'])}”" + (f"<span class=via>{via}</span>" if via else "") + "</li>"
+    return f"<li data-ex={i}>“{html.escape(q['text'])}”" + (f"<span class=via>{via}</span>" if via else "") + "</li>"
 
 
 def short_name(name):
@@ -147,6 +147,70 @@ def write_page(out, page, why):
     print(f"No Chrome, Chromium or Playwright here ({why}), so wrote the page instead: {html_out}")
 
 
+def build_page(s, c, prompts, template=os.path.join(ASSETS, "template.html"), edit=False):
+    """The card as one HTML page. Each card, example and New this week tile carries its index in
+    cards.json (data-card, data-ex, data-first) for the editor. A hidden section is left out, or kept
+    and marked data-hidden when the page is for the editor."""
+    places = {x["key"] for x in s["places"]}
+    unknown = [k for card in c["cards"] for k in card.get("places", []) if k not in places]
+    if unknown: sys.exit(f"Not a place in stats.json: {', '.join(unknown)}. Use one of: {', '.join(places)}")
+    owner = {}
+    for i, card in enumerate(c["cards"]):
+        for p in prompts:
+            if p["place"] in card.get("places", []): owner.setdefault(p["id"], i)
+    for i, card in enumerate(c["cards"]):
+        for pid in card.get("moved", []): owner[pid] = i
+    used = [0] * len(c["cards"])
+    for p in prompts:
+        if p["id"] in owner: used[owner[p["id"]]] += p["tokens"]
+    biggest = max((t for t, card in zip(used, c["cards"]) if edit or not card.get("hidden")), default=1) or 1
+    cards = ""
+    for ci, card, t in sorted(zip(range(len(used)), c["cards"], used), key=lambda x: -x[2]):
+        if card.get("hidden") and not edit: continue
+        share = max(1, round(100 * t / s["tokens"])) if s["tokens"] else 1
+        qs = "".join(example(q, i) for i, q in enumerate(card["examples"]))
+        cards += (f"<div class=card data-card={ci}{' data-hidden' if card.get('hidden') else ''}><div class=top><div class=name>{html.escape(card['title'])}</div>"
+                  f"<div class=nums><b>{share}%</b></div></div>"
+                  f"<div class=track><div class=bar style=\"width:{max(100*t/biggest, 1.5):.1f}%\"></div></div>"
+                  f"<ul>{qs}</ul></div>")
+
+    sub = (f"{s['sessions']} conversations · {s['messages_sent']:,} messages sent"
+           f" · {s['messages_received']:,} replies")
+    persona = c.get("persona")
+    persona_html = (f"<div class=persona id=persona><span class=pn>{html.escape(persona['name'])}</span>"
+                    f"<span class=pl>{html.escape(persona['line'])}</span></div>") if persona else "<div class=persona id=persona hidden></div>"
+    items = ""
+    for k, x in enumerate(c.get("firsts", [])):
+        x = {"name": x} if isinstance(x, str) else x
+        items += (f"<div class=first data-first={k}><div class=fl>" + (f"<div class=fk>{html.escape(x['kind'])}</div>" if x.get("kind") else "")
+                  + f"<div class=fn>{html.escape(x['name'])}</div></div><div class=fr>"
+                  + (f"<div class=fd>{html.escape(x['detail'])}</div>" if x.get("detail") else "")
+                  + (f"<div class=fq>“{html.escape(x['example'])}”</div>" if x.get("example") else "") + "</div></div>")
+    hide_firsts = c.get("firsts_hidden")
+    firsts_html = (f"<div class=firsts{' data-hidden' if hide_firsts else ''}><div class=mh>New this week</div><div class=fgrid>{items}</div></div>"
+                   if items and (edit or not hide_firsts) else "")
+    logo = re.search(r' d="([^"]+)"', open(os.path.join(ICONS, "claude.svg"), encoding="utf-8").read()).group(1)
+    footer = c.get("footer", ["See your week in Claude Code:", "1. Ask “Install the my-week-in-claude plugin”",
+                              "2. Start a new session", "3. Ask “Show me my week in Claude”"])
+    footer = [footer] if isinstance(footer, str) else footer
+    footer = (f'<div style="margin-bottom:4px">{html.escape(footer[0])}</div>' + "".join(
+        f'<span style="display:inline-block;white-space:nowrap;margin:0 9px">{html.escape(x)}</span>' for x in footer[1:]))
+    page = open(template, encoding="utf-8").read()
+    for k, v in {"{name}": f"<h1>{html.escape(short_name(c['name']))}</h1>" if c.get("name") else "",
+                 "{logo}": f'<svg viewBox="0 0 24 24" width=20 height=20 fill="#D97757"><path d="{logo}"/></svg>',
+                 "{title}": html.escape(c.get("title", "My week in Claude")),
+                 "{sub}": sub, "{span}": span(s['since'], s['until']), "{persona}": persona_html, "{firsts}": firsts_html,
+                 "{footer}": footer, "{note}": html.escape(c.get("note", NOTE)), "{models}": models_html(s["models"]), "{cards}": cards}.items():
+        page = page.replace(k, v)
+    return page
+
+
+def load_prompts(stats_path):
+    path = os.path.join(os.path.dirname(os.path.abspath(stats_path)), "prompts.json")
+    if not os.path.exists(path): sys.exit(f"No prompts.json at {path}: it must sit next to stats.json.")
+    return json.load(open(path, encoding="utf-8"))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("stats"); ap.add_argument("cards")
@@ -161,58 +225,7 @@ def main():
     folder = os.path.abspath(a.out)
     png = os.path.join(folder, os.path.basename(folder) + ".png")
     pdf = os.path.splitext(png)[0] + ".pdf"
-
-    prompts_path = os.path.join(os.path.dirname(os.path.abspath(a.stats)), "prompts.json")
-    if not os.path.exists(prompts_path): sys.exit(f"No prompts.json at {prompts_path}: it must sit next to stats.json.")
-    prompts = json.load(open(prompts_path, encoding="utf-8"))
-    places = {x["key"] for x in s["places"]}
-    unknown = [k for card in c["cards"] for k in card.get("places", []) if k not in places]
-    if unknown: sys.exit(f"Not a place in stats.json: {', '.join(unknown)}. Use one of: {', '.join(places)}")
-    owner = {}
-    for i, card in enumerate(c["cards"]):
-        for p in prompts:
-            if p["place"] in card.get("places", []): owner.setdefault(p["id"], i)
-    for i, card in enumerate(c["cards"]):
-        for pid in card.get("moved", []): owner[pid] = i
-    used = [0] * len(c["cards"])
-    for p in prompts:
-        if p["id"] in owner: used[owner[p["id"]]] += p["tokens"]
-    biggest = max(used, default=1) or 1
-    cards = ""
-    for card, t in sorted(zip(c["cards"], used), key=lambda x: -x[1]):
-        share = max(1, round(100 * t / s["tokens"])) if s["tokens"] else 1
-        qs = "".join(example(q) for q in card["examples"])
-        cards += (f"<div class=card><div class=top><div class=name>{html.escape(card['title'])}</div>"
-                  f"<div class=nums><b>{share}%</b></div></div>"
-                  f"<div class=track><div class=bar style=\"width:{max(100*t/biggest, 1.5):.1f}%\"></div></div>"
-                  f"<ul>{qs}</ul></div>")
-
-    sub = (f"{s['sessions']} conversations · {s['messages_sent']:,} messages sent"
-           f" · {s['messages_received']:,} replies")
-    persona = c.get("persona")
-    persona_html = (f"<div class=persona><span class=pn>{html.escape(persona['name'])}</span>"
-                    f"<span class=pl>{html.escape(persona['line'])}</span></div>") if persona else ""
-    items = ""
-    for x in c.get("firsts", []):
-        x = {"name": x} if isinstance(x, str) else x
-        items += (f"<div class=first><div class=fl>" + (f"<div class=fk>{html.escape(x['kind'])}</div>" if x.get("kind") else "")
-                  + f"<div class=fn>{html.escape(x['name'])}</div></div><div class=fr>"
-                  + (f"<div class=fd>{html.escape(x['detail'])}</div>" if x.get("detail") else "")
-                  + (f"<div class=fq>“{html.escape(x['example'])}”</div>" if x.get("example") else "") + "</div></div>")
-    firsts_html = f"<div class=firsts><div class=mh>New this week</div><div class=fgrid>{items}</div></div>" if items else ""
-    logo = re.search(r' d="([^"]+)"', open(os.path.join(ICONS, "claude.svg"), encoding="utf-8").read()).group(1)
-    footer = c.get("footer", ["See your week in Claude Code:", "1. Ask “Install the my-week-in-claude plugin”",
-                              "2. Start a new session", "3. Ask “Show me my week in Claude”"])
-    footer = [footer] if isinstance(footer, str) else footer
-    footer = (f'<div style="margin-bottom:4px">{html.escape(footer[0])}</div>' + "".join(
-        f'<span style="display:inline-block;white-space:nowrap;margin:0 9px">{html.escape(x)}</span>' for x in footer[1:]))
-    page = open(a.template, encoding="utf-8").read()
-    for k, v in {"{name}": f"<h1>{html.escape(short_name(c['name']))}</h1>" if c.get("name") else "",
-                 "{logo}": f'<svg viewBox="0 0 24 24" width=20 height=20 fill="#D97757"><path d="{logo}"/></svg>',
-                 "{title}": html.escape(c.get("title", "My week in Claude")),
-                 "{sub}": sub, "{span}": span(s['since'], s['until']), "{persona}": persona_html, "{firsts}": firsts_html,
-                 "{footer}": footer, "{note}": html.escape(c.get("note", NOTE)), "{models}": models_html(s["models"]), "{cards}": cards}.items():
-        page = page.replace(k, v)
+    page = build_page(s, c, load_prompts(a.stats), a.template)
 
     os.makedirs(folder, exist_ok=True)
     for f in (png, pdf):
@@ -252,7 +265,8 @@ def main():
             except subprocess.TimeoutExpired:
                 return write_page(png, page, f"{chrome} timed out")
             if not os.path.exists(png): return write_page(png, page, f"{chrome} wrote no PNG")
-    names = possible_names(c["cards"], [f for f in c.get("firsts", []) if isinstance(f, dict)], c.get("persona"))
+    names = possible_names([x for x in c["cards"] if not x.get("hidden")],
+                           [] if c.get("firsts_hidden") else [f for f in c.get("firsts", []) if isinstance(f, dict)], c.get("persona"))
     if names:
         print("Check these for names, customers or anything to redact:")
         for w, t in names.items(): print(f"  {w}  ({t})")

@@ -1,0 +1,427 @@
+<style>
+body{padding:104px 200px 60px;min-width:900px}
+body.ed-embed{padding:24px 200px 40px}
+.w{margin:0 auto;position:relative}
+.ed-bar{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:12px;padding:10px 20px;
+  background:#262624;border-bottom:1px solid #3a3935;font-family:Poppins,sans-serif;font-size:13px;color:#e8e6dc}
+.ed-title{font-weight:600;color:#faf9f5;display:flex;align-items:center;gap:8px}
+.ed-bar select,.ed-bar input{font:inherit;background:#141413;color:#faf9f5;border:1px solid #4a4943;border-radius:8px;padding:6px 10px}
+.ed-bar input{flex:1;min-width:160px;max-width:420px}
+.ed-gap{flex:1}
+.ed-btn{font:inherit;font-weight:600;border:0;border-radius:8px;padding:8px 14px;cursor:pointer;background:#3a3935;color:#faf9f5;white-space:nowrap}
+.ed-btn.ed-primary{background:#d97757;color:#141413}
+.ed-btn:disabled{opacity:.45;cursor:not-allowed}
+.ed-btn:focus-visible,.ed-i:focus-visible,.ed-arrow:focus-visible,.ed-add:focus-visible{outline:2px solid #d97757;outline-offset:2px}
+.ed-count{color:#b0aea5;white-space:nowrap}
+.ed-msg{position:fixed;top:55px;left:0;right:0;z-index:19;display:flex;gap:12px;align-items:center;justify-content:center;padding:8px 16px;
+  font-family:Poppins,sans-serif;font-size:13px;font-weight:600;background:#3a3935;color:#faf9f5}
+.ed-msg[hidden]{display:none}
+.ed-msg.busy{background:#d97757;color:#141413}
+.ed-msg.error{background:#b3261e;color:#fff}
+.ed-msg.changes{background:#2f5d50;color:#fff}
+.ed-msg .ed-btn{padding:5px 12px;background:rgba(0,0,0,.25);color:inherit}
+.ed-msg q{font-weight:400;font-style:italic}
+li[data-ex],.first[data-first],.card,.firsts{position:relative}
+.ed-ctl{position:absolute;top:0;left:calc(100% + 72px);display:flex;gap:3px;font-family:Poppins,sans-serif}
+.ed-sec{position:absolute;top:16px;left:calc(100% + 52px);font-family:Poppins,sans-serif}
+.ed-sec .ed-btn{font-size:12px;padding:5px 10px;background:#2b2a27;color:#b0aea5}
+.ed-sec .ed-btn:hover{color:#faf9f5}
+.ed-i{width:25px;height:25px;border-radius:8px;border:0;background:#2b2a27;color:#b0aea5;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.ed-i svg{width:14px;height:14px}
+.ed-i:hover{background:#3a3935;color:#faf9f5}
+.ed-i[aria-pressed=true]{background:#d97757;color:#141413}
+.ed-i:disabled{opacity:.4;cursor:not-allowed}
+.ed-tags{display:inline-flex;flex-wrap:wrap;gap:4px;margin-left:6px;vertical-align:1px}
+.ed-tags:empty{display:none}
+.ed-tags span{font-family:Poppins,sans-serif;font-size:11px;font-style:normal;font-weight:600;color:#faf9f5;background:#c4613f;border-radius:999px;padding:1px 8px;white-space:nowrap}
+.ed-tags span.ed-new-tag{background:#2f7a5f}
+.ed-del{text-decoration:line-through;color:#a9a69c}
+.ed-del .ed-tags span{background:#78766e}
+.ed-new{list-style:none;margin-left:-18px}
+.ed-ph{display:flex;gap:8px;align-items:center;border:1.5px dashed #d97757;border-radius:10px;padding:8px 10px;background:#faf9f5}
+.ed-ph input{flex:1;font:inherit;font-size:14px;border:0;background:transparent;outline:none;color:#3d3c37}
+.ed-ph .ed-i{background:#f0eee6;color:#78766e}
+.ed-add{display:block;margin:4px 0 6px;font-family:Poppins,sans-serif;font-size:13px;font-weight:600;color:#c4613f;background:transparent;
+  border:1.5px dashed #e2c4b5;border-radius:10px;padding:6px 12px;cursor:pointer}
+.ed-add:disabled{color:#a9a69c;border-color:#e2dfd3;cursor:not-allowed}
+.ed-pc{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:2px 0 10px;font-family:Poppins,sans-serif;font-size:12.5px;color:#b0aea5;position:relative}
+.ed-arrow{width:28px;height:28px;border-radius:999px;border:1px solid #4a4943;background:transparent;color:#faf9f5;cursor:pointer;font-size:14px;line-height:1}
+.ed-pc .ed-add{display:inline-block;margin:0 0 0 6px;color:#e8a58c;border-color:#5a4a42;padding:4px 10px;font-size:12px}
+.ed-pc .ed-add[aria-pressed=true]{background:#d97757;color:#141413;border-color:#d97757}
+.ed-pc .ed-tags{margin-left:2px}
+.ed-none{font-style:italic;color:#78766e;font-family:Lora,serif;font-size:16px;margin:10px 0 2px;position:relative}
+.ed-hidden>*:not(.top):not(.mh):not(.ed-sec){display:none!important}
+.ed-hidden{opacity:.6}
+.ed-hidden .name,.ed-hidden>.mh{text-decoration:line-through}
+.ed-sec-tag{font-family:Poppins,sans-serif;font-size:11px;font-weight:600;color:#fff;background:#78766e;border-radius:999px;padding:1px 8px;margin-left:8px;vertical-align:3px;text-decoration:none;display:inline-block}
+.ed-sec-tag[hidden]{display:none}
+.mh .ed-sec-tag{color:#fff;font-size:11px;font-weight:600;margin-left:8px}
+body.ed-hl .ed-changed{background:#e3f1e8;border-radius:8px;box-shadow:0 0 0 4px #e3f1e8}
+body.ed-hl .card.ed-changed,body.ed-hl .firsts.ed-changed{box-shadow:0 0 0 3px #2f7a5f}
+body.ed-hl .persona.ed-changed{background:#2f5d50;border-radius:8px;box-shadow:0 0 0 6px #2f5d50}
+body:not(.ed-hl) .ed-new-tag{display:none}
+.ed-removed{font-family:Poppins,sans-serif;font-size:12px;color:#2f7a5f;font-weight:600;margin:2px 0 4px}
+body:not(.ed-hl) .ed-removed{display:none}
+body.ed-busy .w{opacity:.55;pointer-events:none}
+body.ed-ro .ed-ctl,body.ed-ro .ed-add:not(.ed-keep),body.ed-ro .ed-sec,body.ed-ro .ed-pc .ed-i,body.ed-ro .ed-pc .ed-add{display:none}
+body.ed-ro .ed-ph input{pointer-events:none}
+body.ed-ro .ed-ph .ed-i{display:none}
+.ed-cmt{position:relative;z-index:1;margin:6px 0 10px;font-family:Poppins,sans-serif}
+.ed-cmt[hidden]{display:none}
+.first .ed-cmt{grid-column:1/-1}
+.ed-cmt input{width:100%;box-sizing:border-box;font:inherit;font-size:13px;font-style:normal;border:1.5px solid #e2c4b5;border-radius:8px;padding:6px 10px;background:#fff8f4;color:#3d3c37;outline:none}
+.ed-cmt input:focus{border-color:#d97757}
+.ed-pcm{flex-basis:100%}
+.ed-pcm input{background:#262624;color:#faf9f5;border-color:#5a4a42}
+body.ed-ro .ed-cmt input{border-style:dashed}
+</style>
+<div class=ed-bar role=toolbar aria-label="Edit your card">
+  <span class=ed-title><svg viewBox="0 0 24 24" width=18 height=18 fill="#D97757"><circle cx=12 cy=12 r=5 /></svg>Edit mode</span>
+  <select id=ed-version aria-label="Version"></select>
+  <button class=ed-btn id=ed-restore hidden>Carry on from this version</button>
+  <span class=ed-gap></span>
+  <input id=ed-note placeholder="Anything else for Claude? (optional)" aria-label="Anything else for Claude">
+  <span class=ed-count id=ed-count aria-live=polite></span>
+  <button class="ed-btn ed-primary" id=ed-send>Send to Claude</button>
+  <button class=ed-btn id=ed-happy>I'm happy with it</button>
+</div>
+<div class=ed-msg id=ed-msg role=status hidden></div>
+<script>
+(function(){
+const E = window.EDIT, $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const old = E.version !== E.latest, readonly = old || !!E.embed;
+const send = $('#ed-send'), happy = $('#ed-happy'), note = $('#ed-note'), msg = $('#ed-msg'), sel = $('#ed-version');
+const marks = {}, painters = {}, adds = {}, addFns = {}, sections = {}, startSections = {}, secPainters = {}, personaVotes = {}, personaComments = {};
+let persona = E.persona, morePersonas = false, showPersona = () => {}, isBusy = false, ready = false;
+const KEY = 'ed-pending-' + E.version;
+const ICON = {
+  up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12M15 5.9 14 10h5.8a2 2 0 0 1 2 2.3l-1.4 8A2 2 0 0 1 18.4 22H7V10l4-8a3 3 0 0 1 4 3.9Z"/></svg>',
+  down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14V2M9 18.1 10 14H4.2a2 2 0 0 1-2-2.3l1.4-8A2 2 0 0 1 5.6 2H17v12l-4 8a3 3 0 0 1-4-3.9Z"/></svg>',
+  anon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 11-5.7M16 16l5 5M21 16l-5 5"/></svg>',
+  del: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>',
+  undo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg>',
+  note: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>'};
+
+function el(tag, cls, txt){ const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+function iconButton(kind, label, onclick){
+  const b = el('button', 'ed-i'); b.type = 'button'; b.innerHTML = ICON[kind]; b.title = label;
+  b.setAttribute('aria-label', label); b.onclick = onclick; return b;
+}
+function setTags(box, list, cls){ box.innerHTML = ''; list.filter(Boolean).forEach(t => box.append(el('span', cls || '', t))); }
+function commentBox(placeholder, label, get, set){
+  const box = el('div', 'ed-cmt'), input = el('input');
+  input.placeholder = placeholder; input.setAttribute('aria-label', label); input.readOnly = readonly;
+  input.oninput = () => { set(input.value); refresh(); };
+  box.append(input);
+  let open = false;
+  const btn = iconButton('note', 'Tell Claude what you think of it', () => { open = !open; paint(); if (open) input.focus(); });
+  function paint(off){
+    const v = get() || ''; if (document.activeElement !== input) input.value = v;
+    box.hidden = !!off || !(open || v.trim()); btn.setAttribute('aria-pressed', !!v.trim());
+  }
+  return {box, btn, paint, close(){ open = false; }};
+}
+function banner(kind, text, buttons){
+  msg.hidden = false; msg.className = 'ed-msg ' + (kind || ''); msg.innerHTML = '';
+  if (typeof text === 'string') msg.append(el('span', '', text)); else msg.append(text);
+  (buttons || []).forEach(([label, fn]) => { const b = el('button', 'ed-btn', label); b.type = 'button'; b.onclick = fn; msg.append(b); });
+}
+
+/* Examples and New this week tiles */
+function controls(item, key){
+  const m = marks[key] = {}, tags = el('span', 'ed-tags');
+  const up = iconButton('up', 'Good one, keep it', () => { m.vote = m.vote === 'up' ? null : 'up'; paint(); });
+  const down = iconButton('down', 'Swap it for another', () => { m.vote = m.vote === 'down' ? null : 'down'; paint(); });
+  const anon = iconButton('anon', 'Anonymise it further', () => { m.anonymise = !m.anonymise; paint(); });
+  const del = iconButton('del', 'Remove it', () => { m.deleted = !m.deleted; paint(); });
+  const cm = commentBox('What do you think of it? Claude reads this when you send', 'Your note on this one', () => m.comment, v => { m.comment = v; });
+  cm.btn.onclick = (f => () => { f(); paint(); })(cm.btn.onclick);
+  function paint(){
+    cm.paint(m.deleted);
+    up.setAttribute('aria-pressed', m.vote === 'up'); down.setAttribute('aria-pressed', m.vote === 'down');
+    anon.setAttribute('aria-pressed', !!m.anonymise);
+    del.innerHTML = m.deleted ? ICON.undo : ICON.del;
+    del.title = m.deleted ? 'Bring it back' : 'Remove it'; del.setAttribute('aria-label', del.title);
+    [up, down, anon, cm.btn].forEach(b => b.disabled = !!m.deleted);
+    item.classList.toggle('ed-del', !!m.deleted);
+    setTags(tags, m.deleted ? ['Removed'] : [m.vote === 'down' && 'Swap it', m.anonymise && 'Anonymise it', m.vote === 'up' && 'Liked']);
+    refresh();
+  }
+  painters[key] = paint;
+  const ctl = el('div', 'ed-ctl'); ctl.append(up, down, anon, cm.btn, del);
+  const fr = item.querySelector('.fr');
+  if (fr) fr.append(tags); else item.append(tags);
+  item.append(cm.box, ctl);
+  paint();
+}
+
+/* Sections: each card, and New this week */
+function sectionControls(box, key, titleEl){
+  sections[key] = startSections[key] = box.hasAttribute('data-hidden');
+  const wrap = el('div', 'ed-sec'), b = el('button', 'ed-btn'); b.type = 'button'; wrap.append(b); box.append(wrap);
+  const tag = el('span', 'ed-sec-tag', 'Hidden from the card');
+  titleEl.append(tag);
+  function paint(){
+    box.classList.toggle('ed-hidden', sections[key]); tag.hidden = !sections[key];
+    b.textContent = sections[key] ? 'Bring it back' : 'Hide section';
+    b.title = sections[key] ? 'Show this section on the card again' : 'Leave this whole section off the card';
+    refresh();
+  }
+  b.onclick = () => { sections[key] = !sections[key]; paint(); };
+  secPainters[key] = paint; paint();
+}
+
+$$('.card[data-card]').forEach(card => {
+  const ci = card.dataset.card, ul = card.querySelector('ul');
+  card.querySelectorAll('li[data-ex]').forEach(li => controls(li, `ex:${ci}:${li.dataset.ex}`));
+  adds[ci] = [];
+  const add = el('button', 'ed-add', '+ Add an example'); add.type = 'button';
+  addFns[ci] = hint => {
+    const li = el('li', 'ed-new'), entry = {hint: hint || ''}; adds[ci].push(entry);
+    const box = el('div', 'ed-ph'), input = el('input');
+    input.placeholder = 'Claude adds one here. What kind? (optional)'; input.value = entry.hint;
+    input.setAttribute('aria-label', 'What kind of example to add');
+    input.oninput = () => { entry.hint = input.value; };
+    const rm = iconButton('x', 'Don’t add it', () => { adds[ci].splice(adds[ci].indexOf(entry), 1); li.remove(); refresh(); });
+    box.append(input, rm); li.append(box); ul.append(li); refresh(); return input;
+  };
+  add.onclick = () => addFns[ci]().focus();
+  ul.after(add); card._add = add;
+  sectionControls(card, `card:${ci}`, card.querySelector('.name'));
+});
+$$('.first[data-first]').forEach(f => controls(f, `first:${f.dataset.first}`));
+const firstsBox = $('.firsts');
+if (firstsBox) sectionControls(firstsBox, 'firsts', firstsBox.querySelector('.mh'));
+
+/* Persona */
+const pBox = $('#persona');
+if (E.personas.length && pBox){
+  const pc = el('div', 'ed-pc'), none = el('div', 'ed-none', 'No persona');
+  const prev = el('button', 'ed-arrow', '‹'), next = el('button', 'ed-arrow', '›'), label = el('span');
+  prev.type = next.type = 'button'; label.setAttribute('aria-live', 'polite');
+  prev.setAttribute('aria-label', 'Previous persona'); next.setAttribute('aria-label', 'Next persona');
+  const up = iconButton('up', 'Good one, more like this', () => vote('up'));
+  const down = iconButton('down', 'Not this one, write another', () => vote('down'));
+  const more = el('button', 'ed-add'); more.type = 'button';
+  const tags = el('span', 'ed-tags');
+  const full = E.personas.length >= E.maxPersonas;
+  more.disabled = full; more.title = full ? `Up to ${E.maxPersonas} personas` : '';
+  more.onclick = () => { morePersonas = !morePersonas; show(); };
+  const cm = commentBox('What do you think of it? Claude reads this when you send', 'Your note on this persona',
+    () => personaComments[persona], v => { personaComments[persona] = v; });
+  cm.box.classList.add('ed-pcm');
+  cm.btn.onclick = (f => () => { f(); show(); })(cm.btn.onclick);
+  const options = [...E.personas.keys(), null];
+  const step = d => { persona = options[(options.indexOf(persona) + d + options.length) % options.length]; cm.close(); show(); };
+  prev.onclick = () => step(-1); next.onclick = () => step(1);
+  function vote(v){ if (persona === null) return; personaVotes[persona] = personaVotes[persona] === v ? null : v; show(); }
+  showPersona = show;
+  function show(){
+    const v = persona === null ? null : personaVotes[persona];
+    if (persona === null){ pBox.hidden = true; none.hidden = false; label.textContent = 'No persona'; }
+    else {
+      const p = E.personas[persona];
+      pBox.hidden = false; none.hidden = true;
+      pBox.innerHTML = '<span class=pn></span><span class=pl></span>';
+      pBox.querySelector('.pn').textContent = p.name; pBox.querySelector('.pl').textContent = p.line;
+      label.textContent = `Persona ${persona + 1} of ${E.personas.length}`;
+    }
+    up.disabled = down.disabled = cm.btn.disabled = persona === null;
+    cm.paint(persona === null);
+    up.setAttribute('aria-pressed', v === 'up'); down.setAttribute('aria-pressed', v === 'down');
+    more.setAttribute('aria-pressed', morePersonas);
+    more.textContent = morePersonas ? (old ? `You asked for ${E.more} more` : `✓ Claude writes ${E.more} more when you send`) : `+ Ask for ${E.more} more`;
+    const isNew = E.changes && persona !== null ? E.changes.newPersonas[persona] : null;
+    pBox.classList.toggle('ed-changed', !!(E.changes && (isNew || (persona === E.persona && E.changes.persona))));
+    setTags(tags, [isNew && changeLabel(isNew, true), v === 'down' && (old ? 'You asked for another' : 'Claude rewrites it when you send'), v === 'up' && 'Liked', readonly && morePersonas && `You asked for ${E.more} more`]);
+    if (isNew){ tags.firstChild.className = 'ed-new-tag'; tags.firstChild.title = whyTitle(isNew); }
+    refresh();
+  }
+  pc.append(prev, label, next, up, down, cm.btn, more, tags, cm.box); pBox.after(none, pc); show();
+}
+
+/* Toolbar state */
+note.oninput = () => refresh();
+function content(){
+  let n = 0;
+  $$('.card[data-card]').forEach(card => {
+    const ci = card.dataset.card; if (sections[`card:${ci}`]) return;
+    n += [...card.querySelectorAll('li[data-ex]')].filter(li => !marks[`ex:${ci}:${li.dataset.ex}`]?.deleted).length + adds[ci].length;
+  });
+  if (firstsBox && !sections.firsts) n += $$('.first[data-first]').filter(f => !marks[`first:${f.dataset.first}`]?.deleted).length;
+  return n;
+}
+function needsClaude(){
+  return Object.values(marks).some(m => !m.deleted && (m.vote === 'down' || m.anonymise || (m.comment || '').trim()))
+    || Object.values(personaComments).some(c => (c || '').trim())
+    || Object.values(adds).some(a => a.length) || !!note.value.trim() || morePersonas
+    || Object.values(personaVotes).includes('down');
+}
+function changeCount(){
+  return Object.values(marks).filter(m => m.deleted || m.vote || m.anonymise || (m.comment || '').trim()).length
+    + Object.values(personaComments).filter(c => (c || '').trim()).length
+    + Object.values(adds).reduce((a, x) => a + x.length, 0) + (persona !== E.persona) + !!note.value.trim()
+    + Object.keys(sections).filter(k => sections[k] !== startSections[k]).length
+    + Object.values(personaVotes).filter(Boolean).length + morePersonas;
+}
+function refresh(){
+  if (!ready) return;
+  if (readonly || isBusy) return;
+  const n = changeCount(), empty = content() === 0;
+  $('#ed-count').textContent = empty ? 'Nothing left on the card' : n ? `${n} change${n > 1 ? 's' : ''} to send` : '';
+  send.disabled = !n || empty;
+  send.title = empty ? 'There’s nothing left to put on the card. Bring back a section or an example first.' : n ? '' : 'Make a change first';
+  happy.disabled = empty || needsClaude();
+  happy.title = empty ? send.title : happy.disabled ? 'Send your changes to Claude first' : '';
+  $$('.card[data-card]').forEach(card => {
+    const ci = card.dataset.card;
+    const kept = [...card.querySelectorAll('li[data-ex]')].filter(li => !marks[`ex:${ci}:${li.dataset.ex}`]?.deleted).length;
+    const isFull = kept + adds[ci].length >= E.max;
+    card._add.disabled = isFull; card._add.title = isFull ? `Up to ${E.max} examples per card` : '';
+  });
+}
+
+/* Put back a set of changes: what was sent from this version, or what's waiting to be sent */
+function restore(p){
+  if (!p) return;
+  Object.entries(p.items || {}).forEach(([k, m]) => { if (marks[k]){ Object.assign(marks[k], m); painters[k](); } });
+  Object.entries(p.adds || {}).forEach(([ci, hints]) => hints.forEach(h => addFns[ci] && addFns[ci](h)));
+  Object.entries(p.sections || {}).forEach(([k, v]) => { if (k in sections){ sections[k] = v; secPainters[k](); } });
+  Object.assign(personaVotes, p.personaVotes || {}); Object.assign(personaComments, p.personaComments || {}); morePersonas = !!p.morePersonas;
+  if ('persona' in p) persona = p.persona;
+  note.value = p.note || ''; showPersona(); refresh();
+}
+
+function body(done){
+  const a = {}; Object.entries(adds).forEach(([k, v]) => { if (v.length) a[k] = v.map(x => x.hint.trim()); });
+  return {version: E.version, persona, items: marks, adds: a, sections, personaVotes, personaComments, morePersonas, note: note.value, done};
+}
+async function post(path, data){
+  let r;
+  try { r = await fetch(path, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)}); }
+  catch (e) { throw new Error('Edit mode has closed. Ask Claude in the chat to open it again.'); }
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || 'Something went wrong saving your changes.');
+  return j;
+}
+function busy(on, text){
+  isBusy = on; document.body.classList.toggle('ed-busy', on);
+  [send, happy, note].forEach(x => x.disabled = on);
+  if (on) banner('busy', text || 'Claude is working on your changes. This page updates when they’re ready.', [['Cancel', cancel]]);
+  else { msg.hidden = true; refresh(); }
+}
+async function cancel(){
+  await post('/cancel', {}).catch(() => {});
+  busy(false); banner('', 'Cancelled. Your changes are still here, so you can change them and send again.');
+}
+function failed(text){ busy(false); banner('error', text); }
+
+send.onclick = async () => {
+  try { sessionStorage.setItem(KEY, JSON.stringify(body(false))); } catch (e) {}
+  busy(true, 'Sending…');
+  try {
+    const r = await post('/send', body(false));
+    if (r.waiting){ busy(true); poll(); } else { clearPending(); location.href = '/'; }
+  } catch (e) { failed(e.message); }
+};
+happy.onclick = async () => {
+  busy(true, 'Saving…');
+  try { await post('/send', body(true)); clearPending(); busy(true, 'Done. Claude is drawing your final image and PDF, so head back to the chat.');
+    msg.querySelector('button')?.remove(); }
+  catch (e) { failed(e.message); }
+};
+function clearPending(){ try { sessionStorage.removeItem(KEY); } catch (e) {} }
+function pending(){ try { return JSON.parse(sessionStorage.getItem(KEY)); } catch (e) { return null; } }
+
+async function poll(){
+  let s;
+  try { s = await (await fetch('/state')).json(); }
+  catch (e) { return failed('Edit mode has closed. Ask Claude in the chat to open it again.'); }
+  if (s.done){ busy(true, 'Done. Claude is drawing your final image and PDF, so head back to the chat.'); msg.querySelector('button')?.remove(); return; }
+  if (isBusy && s.error) return failed(`Claude couldn’t make the next version: ${s.error} Your changes are still here, so you can try again.`);
+  if (!s.waiting && s.latest > E.version){
+    if (isBusy || !changeCount()){ clearPending(); location.href = '/'; return; }
+    banner('changes', `v${s.latest} is ready.`, [['Show it', () => { location.href = '/'; }]]);
+  }
+  setTimeout(poll, 1500);
+}
+
+/* Versions, feedback on old ones, and what changed in this one */
+E.versions.slice().reverse().forEach(v => {
+  const o = el('option', '', `v${v.n}${v.n === E.latest ? ' (latest)' : ''} · ${v.label || ''}${v.made ? ' · ' + v.made : ''}`);
+  o.value = v.n; o.selected = v.n === E.version; sel.append(o);
+});
+sel.onchange = () => { location.href = sel.value == E.latest ? '/' : `/?v=${sel.value}`; };
+
+function quote(s){ return `“${s.length > 36 ? s.slice(0, 35).trim() + '…' : s}”`; }
+function changeLabel(x, isPersona){
+  if (x.how === 'changed') return E.changes.note ? 'Changed for your note' : isPersona ? 'Added' : 'Changed by Claude';
+  const verb = {swapped: isPersona ? 'Rewritten' : 'Swapped', anonymised: 'Anonymised', rewritten: 'Rewritten', added: 'Added'}[x.how];
+  return x.said ? `${verb} for ${quote(x.said)}` : `${verb}, as you asked`;
+}
+function whyTitle(x){
+  const asked = {swapped: 'You gave it a thumbs down', anonymised: 'You asked for it to be anonymised further',
+    rewritten: 'You left a note on it', added: 'You asked for one more', changed: E.changes.note ? 'Claude changed it for your note' : 'Claude changed it'}[x.how];
+  return x.said ? `${asked}: “${x.said}”` : asked;
+}
+function newTag(item, x){
+  item.classList.add('ed-changed');
+  const t = el('span', 'ed-tags'), s = el('span', 'ed-new-tag', changeLabel(x)); s.title = whyTitle(x); t.append(s);
+  item.querySelector('.ed-tags:not(.ed-mark)').before(t); t.classList.add('ed-mark');
+}
+function highlight(){
+  const c = E.changes; if (!c) return;
+  Object.entries(c.items).forEach(([k, x]) => {
+    const [ci, ei] = k.split(':'), li = $(`.card[data-card="${ci}"] li[data-ex="${ei}"]`);
+    if (li) newTag(li, x);
+  });
+  Object.entries(c.firsts).forEach(([k, x]) => { const f = $(`.first[data-first="${k}"]`); if (f) newTag(f, x); });
+  Object.entries(c.cards).forEach(([ci, how]) => {
+    const card = $(`.card[data-card="${ci}"]`); if (!card) return;
+    card.classList.add('ed-changed');
+    card.querySelector('.name').append(el('span', 'ed-sec-tag ed-new-tag', how === 'new' ? 'Added section' : how === 'back' ? 'Back' : 'Hidden now'));
+  });
+  Object.entries(c.removed).forEach(([ci, n]) => {
+    const card = $(`.card[data-card="${ci}"]`);
+    if (card) card.querySelector('.track').after(el('div', 'ed-removed', `${n} removed since v${c.from}`));
+  });
+  if (c.firstsSection && firstsBox) firstsBox.classList.add('ed-changed');
+}
+
+if (E.embed){
+  $('.ed-bar').remove(); msg.remove(); document.body.classList.add('ed-embed', 'ed-ro');
+  if (E.embed === 'feedback') restore(E.feedback);
+  else { highlight(); document.body.classList.add('ed-hl'); }
+  showPersona();
+  return;
+}
+if (old){
+  document.body.classList.add('ed-ro');
+  [send, happy, note].forEach(x => x.hidden = true);
+  const r = $('#ed-restore'); r.hidden = false;
+  r.onclick = async () => { try { await post('/restore', {version: E.version}); location.href = '/'; } catch (e) { banner('error', e.message); } };
+  const f = E.feedback;
+  restore(f);
+  const text = el('span');
+  text.append(f ? `v${E.version}, with the feedback you sent on it.` : `v${E.version}. You didn’t send any feedback on it.`);
+  if (f && f.note){ text.append(' Your note: '); text.append(el('q', '', f.note)); }
+  banner('', text, [[`Compare with v${E.latest}`, () => { location.href = `/compare?a=${E.version}&b=${E.latest}`; }]]);
+  return;
+}
+highlight();
+if (E.changes && E.changes.count){
+  document.body.classList.add('ed-hl');
+  const toggle = () => { document.body.classList.toggle('ed-hl'); b[0][0] = document.body.classList.contains('ed-hl') ? 'Hide highlights' : 'Show highlights'; show(); };
+  const b = [['Hide highlights', toggle], [`Compare with v${E.changes.from}`, () => { location.href = `/compare?a=${E.changes.from}&b=${E.version}`; }]];
+  const show = () => banner('changes', `${E.changes.count} change${E.changes.count > 1 ? 's' : ''} since v${E.changes.from}, highlighted in green.`, b);
+  show();
+}
+fetch('/state').then(r => r.json()).then(s => {
+  if (s.waiting){ restore(pending()); busy(true); poll(); }
+  else if (s.error && pending()){ restore(pending()); failed(`Claude couldn’t make the next version: ${s.error} Your changes are still here, so you can try again.`); poll(); }
+  else poll();
+}).catch(() => failed('Edit mode has closed. Ask Claude in the chat to open it again.'));
+ready = true; refresh();
+})();
+</script>

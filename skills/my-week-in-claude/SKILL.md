@@ -35,7 +35,7 @@ question, copied exactly.
 > copy, plus five ideas for working better that stay in this chat. I read your week from the
 > session logs on this machine, take out names and private details, and follow any AI policy that
 > applies to you. Nothing is posted anywhere. It takes about 5 minutes, and uses about as many
-> tokens as a longish conversation. (v1.0.16)
+> tokens as a longish conversation. (v1.0.17)
 
 The options are "Start" and "Not now". Wait for "Start" before anything else, the checks below
 included.
@@ -103,7 +103,7 @@ It writes three files:
 | File | Holds |
 |------|-------|
 | `stats.json` | The window, conversation and message counts, the share of the week per model and per place the work went (`places`), `new_this_week`, `most_agents_at_once` and `used_ever` |
-| `prompts.json` | Every prompt they typed in full, in order within each conversation, with its `id`, `place` (where the work after it went), `wrote` (every place it wrote to), `apps` (every app its work drew on), `session` and `tokens` (how much work followed it). Pasted text shows as `[pasted]` |
+| `prompts.json` | Every prompt they typed in full (runs started by a script or a schedule, such as `claude -p`, and messages from other agents are left out), in order within each conversation, with its `id`, `place` (where the work after it went), `wrote` (every place it wrote to), `apps` (every app its work drew on), `session` and `tokens` (how much work followed it). Pasted text shows as `[pasted]` |
 | `signals.json` | Habits for the five ideas: corrections, bare go-aheads, pasted text, repeated openings, interruptions, and `compacted`, the number of times a conversation of theirs grew so long Claude had to summarise it to carry on. Never goes on the image |
 
 A prompt's `place` is where the work after it was written most often. Every app Claude wrote to
@@ -134,7 +134,7 @@ out, naming the rule.
 ## 2. Write and redact the cards
 
 Read all of `prompts.json`, in parts if it is too long for one read, and write `cards.json` in the shape of `examples/cards.json`: `name`, `cards` (each with `title`,
-`places`, `moved` and `examples`), `persona` and `firsts`. This step takes the most judgement.
+`places`, `moved` and `examples`), `personas`, `persona` and `firsts`. This step takes the most judgement.
 
 - **One card per place the work went**, largest first. Merge two places into one card when they
   are the same work to a reader. Drop one under 1% unless it has a striking example.
@@ -180,15 +180,59 @@ Read all of `prompts.json`, in parts if it is too long for one read, and write `
   first use, which may not show the thing at work, so look nearby in `prompts.json` for a better
   one. Leave it out rather than repeat a card's prompt or force a weak one.
 
-**`persona`** is `{"name", "line"}`, in the style of Spotify Wrapped ("Shapeshifter: One moment
-you're head over heels for an artist. The next, you've moved on. Some say it's erratic. We call it
-eclectic.").
+**`personas`** holds three, each `{"name", "line"}`, and **`persona`** is the one the person picks
+in step 3, left out when they want none.
 
-- The name is a character: "The" and one or two words.
-- The line talks to them as "you" in one or two short sentences, built on something real from
-  their week, and ends on a compliment or a dry second beat.
-- Tease the habit, never the person, and never how much they used.
-- Write three for step 3, each built on a different habit.
+The joke lives in their data, not in a punchline added after it. A line that states a fact and then
+reaches for a witty kicker is the obvious version, and everyone can see it coming. Find the facts
+that are already funny side by side, put the funniest one last, and stop.
+
+The name is "The" and a role the habit earns, one to three words: a job, never an adjective ("The
+Incident Commander", "The Second Opinion", not "The Efficient One"). The line talks to them as
+"you", under 30 words. Every fact in it is true and comes from their week.
+
+Write them in three passes, and put only the three you keep in the file:
+
+1. **Find the material.** List fifteen or more specific things from their week: a number from
+   `stats.json`, a phrase they kept typing, a request few people would make, two requests days
+   apart that clash in size or tone. Skip anything true of most people who use Claude.
+2. **Draft twenty lines**, at least four in each of these shapes:
+   - **Escalation.** Three of their real requests in a row, each sillier than the last, and the
+     silliest one ends the line.
+   - **Clash.** Two true things side by side that should not sit together: ten agents on an outage,
+     then the whole commit history on tabs against spaces.
+   - **Their words against their week.** A phrase they typed, next to a request or a count that
+     really contradicts it. If the contradiction needs explaining, it is not there.
+   - **Deadpan.** One true fact strange enough on its own, told flat, with nothing after it.
+
+   For each line, write the first ending that comes to mind, then throw it away and write another:
+   the first one is the one any reader would guess.
+3. **Keep three, from three different habits and at least two different shapes.** If you can start a
+   subagent, give it the twenty lines and the tests below, and keep the three it picks: a reader who
+   did not write them laughs at different ones. Keep a line only if it passes all of these:
+   - **Can't guess the end.** Cover the second half. If you could have written it yourself, cut it.
+   - **Only them.** If it would fit most people who use Claude, it is a horoscope.
+   - **The surprise comes last.** Cut anything after the word that makes it funny.
+   - **Kind.** It teases a habit they would laugh at themselves. Nothing about their skill, effort
+     or judgement, nothing suggesting Claude did their job, nothing on how much or when they used it.
+   - **No stock shapes.** None of these:
+     - an object or idea acting like a person ("Jargon has filed a complaint", "That PR has never
+       felt so seen", "The bug didn't stand a chance")
+     - a pun, or a second meaning of a word already in the line
+     - an ending that explains the joke, or rates the person ("Management material", "Iconic")
+     - a stock closer ("Are you OK?", "Rough week?", "Say more.", "Who hurt you?")
+     - "X isn't a Y, it's a Z", "...is a lifestyle", "main character", "the real MVP", "chef's
+       kiss", "living rent free", "somebody has learned", an emoji
+
+   If fewer than three pass, draft more rather than lower the bar.
+
+Two that pass, from `examples/cards.json`. They show the bar, not a template: copy their shape and
+the line reads like theirs, not the person's.
+
+- The Incident Commander (escalation): "Ten agents on a failing build. Five on a bug that might not
+  exist. The entire commit history on tabs versus spaces."
+- The Second Opinion (deadpan): "Before opening your own pull request, you had five agents review it
+  from different angles."
 
 ### Redact
 
@@ -225,7 +269,8 @@ author works. `render.py` lists every capitalised word that may be a name: check
 ## 3. Pick the persona
 
 Ask the person to choose one of the three with the question tool, the line as each option's
-description. They can write their own.
+description, and "No persona" as the last option, which leaves `persona` out of `cards.json`.
+They can write their own. They can change their mind in edit mode, in step 6.
 
 ## 4. Render
 
@@ -285,11 +330,56 @@ List every example on the image, card by card. Then give the AI policies:
   search, so the prompts were checked only for names and private details, and they should check
   any policy that applies to them before sharing.
 
-Then ask with the question tool whether they are
-happy with it: "Happy with it" or "Change something". Repeat the links to the image and the PDF just above the
-question, so they know what they are judging.
+Then open edit mode, a page on this machine only where they can change the card themselves. Run
+this in the background, since it keeps serving until you stop it:
 
-They may take out a prompt they would rather not share, swap or move one, rename a card or pick
-another persona. Edit `cards.json`, run step 4 again, open and show the new image as in step 5, and ask again. The image
-is done when they say they are happy. Then close with the link and one line saying that if they
-want any more changes, they can just ask and you'll make them.
+```sh
+python3 "${CLAUDE_SKILL_DIR}/scripts/edit.py" <work dir>
+```
+
+It opens the page in their browser and prints its address: give it as a link too. In one line, say
+what they can do there: flick between the personas, vote on them or ask for more, turn the persona
+off, give each example a thumbs up or down, ask for one to be anonymised further, leave a note on any of them, remove one
+or add more (up to 10 a card), hide a whole section, and go back to any earlier version or
+compare two side by side. Their changes reach you when they press "Send to Claude", and "I'm happy
+with it" finishes. They can also tell you in the chat instead.
+
+Wait for them, in the background as well, so the chat stays free:
+
+```sh
+python3 "${CLAUDE_SKILL_DIR}/scripts/edit.py" <work dir> --wait
+```
+
+It prints what they sent, as JSON. The persona they picked, anything they removed and any section
+they hid are already in `cards.json`. Work through `requests`, following step 2's rules and
+redacting as before:
+
+- `replace`: swap that example for another prompt on the same card, more like the ones in `liked`.
+- `anonymise`: rewrite it so it says less: drop any detail that could point to the person, a
+  colleague or the company, keeping the idea a reader could copy.
+- `add`: add one more example to the card, following `hint` where there is one.
+- `replace_persona`: rewrite that persona in `personas` with step 2's persona method, in the
+  direction of any persona in `liked`.
+- `more_personas`: write `count` new personas the same way and append them to `personas`.
+- `comment` and `comment_persona`: they left a note on it without voting. Do what the note asks.
+  Praise ("love the sarcasm here") means keep it and write more like it.
+
+Any request or `liked` entry can carry a `comment`, which is what they wrote about that item. Follow
+it, and carry praise across to the rest of the card.
+
+Act on `note` as well. Then run `edit.py <work dir> --publish`, which the open page loads as the
+next version, and wait again. If it refuses, fix what it names and publish again.
+
+If you cannot make the next version, run `edit.py <work dir> --fail "<why, in one sentence>"`. The
+page shows the reason with their changes still in place, so they can try again, and you wait
+again.
+
+When what they sent has `done` set, they are happy with it. Render as in step 4, passing the run's
+folder with `--out`, open the image as in step 5, and stop the editor, whose process ID is in
+`<work dir>/editor.json`. Then close with the links and one line saying that if they want any more
+changes, they can just ask and you'll make them.
+
+If edit mode cannot open a browser, ask with the question tool instead whether they are happy with
+it: "Happy with it" or "Change something", with the links to the image and the PDF just above the
+question. Make what they ask for in `cards.json`, render again as in step 4, show it as in step 5,
+and ask again.
