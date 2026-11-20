@@ -317,9 +317,11 @@ def serve(work, no_open, port=0):
                                                         "liked": [], "note": "", "next": "Render cards.json: the person is happy with it"})
                 return self.send(200, json.dumps(result))
             if self.path == "/cancel":
+                if os.path.exists(wpath(work, "working")): save(wpath(work, "cancelled"), {})
                 rm(wpath(work, "feedback.json")); rm(wpath(work, "working"))
                 return self.send(200, "{}")
             if self.path == "/restore":
+                if waiting(): return self.error(409, "Claude is still working on the changes you sent.")
                 n = int(body["version"])
                 if n not in versions(work): return self.error(404, "That version doesn't exist.")
                 return self.send(200, json.dumps({"latest": snapshot(work, load(vpath(work, n)), f"back to v{n}", n)}))
@@ -354,13 +356,18 @@ def wait(work, timeout):
         if end and time.time() > end: sys.exit("No changes sent from the editor in time.")
         time.sleep(1)
     fb = load(path)
+    rm(wpath(work, "cancelled"))
     done = os.path.join(work, "feedback"); os.makedirs(done, exist_ok=True)
     os.replace(path, os.path.join(done, f"{len(os.listdir(done)) + 1}.json"))
-    if fb["requests"] or fb["note"]: save(wpath(work, "working"), {"from": fb["from_version"]})
+    if fb["requests"] or fb["note"] or any(l.get("comment") for l in fb["liked"]):
+        save(wpath(work, "working"), {"from": fb["from_version"]})
     print(json.dumps(fb, ensure_ascii=False, indent=2))
 
 
 def publish(work, label):
+    if os.path.exists(wpath(work, "cancelled")):
+        rm(wpath(work, "cancelled"))
+        sys.exit("Not published: the person cancelled these changes in edit mode. Drop them and wait again.")
     c = load(wpath(work, "cards.json"))
     why = check(work, c)
     if why: sys.exit(f"Not published: {why} Fix cards.json and publish again, or run --fail to tell the person.")
