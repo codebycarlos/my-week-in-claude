@@ -278,7 +278,7 @@ function refresh(){
     const ci = card.dataset.card;
     const kept = [...card.querySelectorAll('li[data-ex]')].filter(li => !marks[`ex:${ci}:${li.dataset.ex}`]?.deleted).length;
     const isFull = kept + adds[ci].length >= E.max;
-    card._add.disabled = isFull; card._add.title = isFull ? `Up to ${E.max} examples per card` : '';
+    card._add.disabled = isFull; card._add.title = isFull ? `Up to ${E.max} examples per section` : '';
   });
 }
 
@@ -339,7 +339,7 @@ async function poll(){
   try { s = await (await fetch('/state')).json(); }
   catch (e) { return failed('Edit mode has closed. Ask Claude in the chat to open it again.'); }
   if (s.done){ busy(true, 'Done. Claude is drawing your final image and PDF, so head back to the chat.'); msg.querySelector('button')?.remove(); return; }
-  if (isBusy && s.error) return failed(`Claude couldn’t make the next version: ${s.error} Your changes are still here, so you can try again.`);
+  if (isBusy && s.error) failed(`Claude couldn’t make the next version: ${s.error} Your changes are still here, so you can try again.`);
   if (!s.waiting && s.latest > E.version){
     if (isBusy || !changeCount()){ clearPending(); location.href = '/'; return; }
     banner('changes', `v${s.latest} is ready.`, [['Show it', () => { location.href = '/'; }]]);
@@ -389,6 +389,7 @@ function highlight(){
   if (c.firstsSection && firstsBox) firstsBox.classList.add('ed-changed');
 }
 
+if (!E.embed) setInterval(() => fetch('/state').catch(() => {}), 60000);
 if (E.embed){
   $('.ed-bar').remove(); msg.remove(); document.body.classList.add('ed-embed', 'ed-ro');
   if (E.embed === 'feedback') restore(E.feedback);

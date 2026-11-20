@@ -31,11 +31,11 @@ Before anything else, ask with the question tool whether to go ahead, with this 
 question, copied exactly.
 
 > Ready to see your week in Claude? It's like Spotify Wrapped for your last week with Claude. You get an
-> image and a PDF to share, with a card for each kind of work and your own prompts as examples anyone could
+> image and a PDF to share, with a section for each kind of work and your own prompts as examples anyone could
 > copy, plus five ideas for working better that stay in this chat. I read your week from the
 > session logs on this machine, take out names and private details, and follow any AI policy that
 > applies to you. Nothing is posted anywhere. It takes about 5 minutes, and uses about as many
-> tokens as a longish conversation. (v1.0.17)
+> tokens as a longish conversation. (v1.0.18)
 
 The options are "Start" and "Not now". Wait for "Start" before anything else, the checks below
 included.
@@ -65,7 +65,7 @@ so the wait feels like part of the fun. Write your own each time, in the spirit 
 
 - Setting up: "Getting everything set up."
 - Measuring: "Reading your week. This is the long bit."
-- Writing the cards: "Sorting your prompts into piles. Some piles are taller than others."
+- Writing the card: "Sorting your prompts into piles. Some piles are taller than others."
 - Redacting: "Taking the names out. Your colleagues will never know they were here."
 - Persona: "Working out who you were this week."
 - Rendering: "Drawing your image. Nearly there."
@@ -131,31 +131,32 @@ Follow the policy's rules on what may be shared, too. In step 6, show the prompt
 for the policy in a table, one row each: what the prompt was about, and why the policy rules it
 out, naming the rule.
 
-## 2. Write and redact the cards
+## 2. Write and redact the card
 
 Read all of `prompts.json`, in parts if it is too long for one read, and write `cards.json` in the shape of `examples/cards.json`: `name`, `cards` (each with `title`,
-`places`, `moved` and `examples`), `personas`, `persona` and `firsts`. This step takes the most judgement.
+`places`, `moved` and `examples`), `personas`, `persona` and `firsts`. The image is one card, and
+each entry in `cards` is a section on it. This step takes the most judgement.
 
-- **One card per place the work went**, largest first. Merge two places into one card when they
+- **One section per place the work went**, largest first. Merge two places into one section when they
   are the same work to a reader. Drop one under 1% unless it has a striking example.
-- **`places`** lists the places a card covers, spelt exactly as in `stats.json`. A card's share is
+- **`places`** lists the places a section covers, spelt exactly as in `stats.json`. A section's share is
   the work after every prompt filed on it. `render.py` stops on a place it does not know.
-- **`moved`** lists the `id` of each prompt whose output was meant for another card but never
+- **`moved`** lists the `id` of each prompt whose output was meant for another section but never
   reached it, and its work moves with it. A Slack message drafted in the chat for the person to
-  paste has the place `answer`, and belongs on the Slack card. Read the text to decide, and give a
-  card for such prompts an empty `places`.
-- **Title each card in everyday words**, starting with an -ing verb and saying what was made and
+  paste has the place `answer`, and belongs in the Slack section. Read the text to decide, and give a
+  section for such prompts an empty `places`.
+- **Title each section in everyday words**, starting with an -ing verb and saying what was made and
   where: "Drafting tickets in Linear", "Looking into things and answering questions".
 - **Call writing "drafting".** For documents, tickets, messages and code, the title says
   "Drafting": "Drafting Notion pages", never "Writing pages in Notion". People rework, review and
   own what goes out, and the image must not suggest Claude did that work for them.
-- **Put each example on the card that holds its prompt**, by its `place` or by `moved`.
-- **Pick two to five examples per card** that show a reader something they had not thought to ask
+- **Put each example in the section that holds its prompt**, by its `place` or by `moved`.
+- **Pick two to five examples per section** that show a reader something they had not thought to ask
   Claude. Skip routine prompts ("yes", "try again").
 - **Order them by how reusable they are.** First the prompt a colleague could use in many
   situations, last the one tied to a single event.
 - **Quote, then trim.** Keep the person's words. Cut with `…`, join a follow-up from the same
-  `session` with `→` on the card of the first prompt, fix
+  `session` with `→` in the section of the first prompt, fix
   typos, and add context in `[square brackets]` where a quote would not make sense alone. Explain
   jargon the same way, or trim it out: a reader who has never used Claude Code should follow
   every line.
@@ -178,7 +179,7 @@ Read all of `prompts.json`, in parts if it is too long for one read, and write `
 - `detail` says in one short sentence what the thing does.
 - `example` is the prompt that led to it. `new_this_week` gives the last prompt typed before the
   first use, which may not show the thing at work, so look nearby in `prompts.json` for a better
-  one. Leave it out rather than repeat a card's prompt or force a weak one.
+  one. Leave it out rather than repeat a section's prompt or force a weak one.
 
 **`personas`** holds three, each `{"name", "line"}`, and **`persona`** is the one the person picks
 in step 3, left out when they want none.
@@ -236,7 +237,7 @@ the line reads like theirs, not the person's.
 
 ### Redact
 
-Go through everything that goes on the image: every example, card titles, the persona, each
+Go through everything that goes on the image: every example, section titles, the persona, each
 `firsts` tile, and the app and model names. A custom connector or a model name can carry a company
 or account name.
 
@@ -316,13 +317,13 @@ Look for:
   for the whole job up front.
 - **Work done one piece at a time** that several agents could do at once.
 - **Something weekly** that could run on a schedule.
-- **A feature or skill they have never used** that fits their cards, from `used_ever`.
+- **A feature or skill they have never used** that fits their week, from `used_ever`.
 
 Base every idea on what is in the files, and give fewer than five rather than pad.
 
 ## 6. Final check
 
-List every example on the image, card by card. Then give the AI policies:
+List every example on the image, section by section. Then give the AI policies:
 
 - **If you found any**, a table of the policies you checked the prompts against, one row each,
   with its title linked to the page. Under it, the table of prompts left out for a policy, if any.
@@ -330,19 +331,22 @@ List every example on the image, card by card. Then give the AI policies:
   search, so the prompts were checked only for names and private details, and they should check
   any policy that applies to them before sharing.
 
-Then open edit mode, a page on this machine only where they can change the card themselves. Run
-this in the background, since it keeps serving until you stop it:
+Then open edit mode, an optional page on this machine only where they can change the card
+themselves. The image and the PDF from step 5 are already final, so the run is finished whether
+they use it, close it or ignore it. Run this in the background:
 
 ```sh
 python3 "${CLAUDE_SKILL_DIR}/scripts/edit.py" <work dir>
 ```
 
-It opens the page in their browser and prints its address: give it as a link too. In one line, say
-what they can do there: flick between the personas, vote on them or ask for more, turn the persona
+It opens the page in their browser and prints its address, and it stops by itself once no page has
+been open for 10 minutes. Close your reply with the links to the image and the PDF, the edit-mode
+link, and one line saying what they can do there: flick between the personas, vote on them or ask for more, turn the persona
 off, give each example a thumbs up or down, ask for one to be anonymised further, leave a note on any of them, remove one
-or add more (up to 10 a card), hide a whole section, and go back to any earlier version or
+or add more (up to 10 a section), hide a whole section, and go back to any earlier version or
 compare two side by side. Their changes reach you when they press "Send to Claude", and "I'm happy
-with it" finishes. They can also tell you in the chat instead.
+with it" finishes. Say that it's optional: they can close it and keep the card as it is, or tell
+you in the chat instead.
 
 Wait for them, in the background as well, so the chat stays free:
 
@@ -354,10 +358,10 @@ It prints what they sent, as JSON. The persona they picked, anything they remove
 they hid are already in `cards.json`. Work through `requests`, following step 2's rules and
 redacting as before:
 
-- `replace`: swap that example for another prompt on the same card, more like the ones in `liked`.
+- `replace`: swap that example for another prompt in the same section, more like the ones in `liked`.
 - `anonymise`: rewrite it so it says less: drop any detail that could point to the person, a
   colleague or the company, keeping the idea a reader could copy.
-- `add`: add one more example to the card, following `hint` where there is one.
+- `add`: add one more example to the section, following `hint` where there is one.
 - `replace_persona`: rewrite that persona in `personas` with step 2's persona method, in the
   direction of any persona in `liked`.
 - `more_personas`: write `count` new personas the same way and append them to `personas`.
@@ -373,6 +377,10 @@ next version, and wait again. If it refuses, fix what it names and publish again
 If you cannot make the next version, run `edit.py <work dir> --fail "<why, in one sentence>"`. The
 page shows the reason with their changes still in place, so they can try again, and you wait
 again.
+
+When it prints `closed`, edit mode stopped without "I'm happy with it". Do what its `next` says:
+render again as in step 4 if any version came after the first, otherwise one line saying edit mode
+has closed.
 
 When what they sent has `done` set, they are happy with it. Render as in step 4, passing the run's
 folder with `--out`, open the image as in step 5, and stop the editor, whose process ID is in

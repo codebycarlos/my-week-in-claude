@@ -10,7 +10,7 @@ card and sends what they want back to Claude.
 The work dir holds stats.json, prompts.json and cards.json. Every version goes in versions/, with the
 feedback sent on it, so the person can look back at any of them, compare two, and carry on from one.
 """
-import argparse, copy, glob, html as H, http.server, json, os, sys, threading, time, urllib.parse, webbrowser
+import argparse, copy, glob, html as H, http.server, json, os, signal, sys, threading, time, urllib.parse, webbrowser
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -233,9 +233,18 @@ def compare(a, b):
     return open(os.path.join(render.ASSETS, "compare.html"), encoding="utf-8").read().replace("{a}", str(a)).replace("{b}", str(b))
 
 
+IDLE = 600
+
+
+def alive(work):
+    """Whether the editor is still serving: it removes editor.json when it stops."""
+    try: os.kill(load(wpath(work, "editor.json"))["pid"], 0); return True
+    except (OSError, KeyError, ValueError): return False
+
+
 def serve(work, no_open, port=0):
     if not versions(work): snapshot(work, load(wpath(work, "cards.json")), "first draft")
-    status = {"done": False}
+    status = {"done": False, "seen": time.time()}
     waiting = lambda: os.path.exists(wpath(work, "feedback.json")) or os.path.exists(wpath(work, "working"))
 
     class Handler(http.server.BaseHTTPRequestHandler):
@@ -250,6 +259,7 @@ def serve(work, no_open, port=0):
         def error(self, code, message): self.send(code, json.dumps({"error": message}))
 
         def do_GET(self):
+            status["seen"] = time.time()
             u = urllib.parse.urlparse(self.path); vs = versions(work); q = urllib.parse.parse_qs(u.query)
             if u.path == "/favicon.ico": return self.send(204, "")
             if u.path == "/state":
@@ -271,6 +281,7 @@ def serve(work, no_open, port=0):
                                f"{H.escape(str(e))}. Ask Claude in the chat to fix it.</body>", "text/html")
 
         def do_POST(self):
+            status["seen"] = time.time()
             if self.headers.get("Origin") not in (None, f"http://127.0.0.1:{port}"): return self.error(403, "Not allowed.")
             try: body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", 0))) or b"{}")
             except ValueError: return self.error(400, "That request didn't make sense.")
@@ -302,14 +313,27 @@ def serve(work, no_open, port=0):
     save(wpath(work, "editor.json"), {"url": url, "pid": os.getpid()})
     print(url, flush=True)
     if not no_open: threading.Timer(0.3, lambda: webbrowser.open(url)).start()
-    srv.serve_forever()
+
+    def idle():
+        while True:
+            time.sleep(15)
+            if time.time() - status["seen"] > IDLE and not waiting(): return srv.shutdown()
+    threading.Thread(target=idle, daemon=True).start()
+    signal.signal(signal.SIGTERM, lambda *a: sys.exit(0))
+    try: srv.serve_forever()
+    finally: rm(wpath(work, "editor.json"))
 
 
 def wait(work, timeout):
     path = wpath(work, "feedback.json")
-    end = time.time() + timeout
+    end = time.time() + timeout if timeout else None
     while not os.path.exists(path):
-        if time.time() > end: sys.exit("No changes sent from the editor in time.")
+        if not alive(work):
+            latest = (versions(work) or [1])[-1]
+            return print(json.dumps({"closed": True, "latest": latest, "next":
+                "Edit mode closed without “I'm happy with it”. " + ("Render cards.json as in step 4 and give the new links."
+                if latest > 1 else "The image is unchanged: say in one line that edit mode has closed.")}, ensure_ascii=False, indent=2))
+        if end and time.time() > end: sys.exit("No changes sent from the editor in time.")
         time.sleep(1)
     fb = load(path)
     done = os.path.join(work, "feedback"); os.makedirs(done, exist_ok=True)
@@ -338,7 +362,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("work")
     ap.add_argument("--wait", action="store_true", help="block until the person sends changes, then print them")
-    ap.add_argument("--timeout", type=int, default=3600, help="seconds --wait waits (default 3600)")
+    ap.add_argument("--timeout", type=int, default=0, help="seconds --wait waits (default: until the editor closes)")
     ap.add_argument("--publish", action="store_true", help="save cards.json as the next version")
     ap.add_argument("--label", default="Claude's changes")
     ap.add_argument("--fail", metavar="WHY", help="tell the page the next version could not be made, and why")
