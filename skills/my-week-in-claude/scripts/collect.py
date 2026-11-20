@@ -18,7 +18,8 @@ CATS = {
 COWORK_INTERNAL = {"workspace", "cowork", "cowork-onboarding", "mcp-registry", "plugins", "scheduled-tasks", "skills",
                    "visualize", "computer-use", "Claude in Chrome"}
 SKIP_PREFIXES = ("<command", "<local-command", "<bash-input", "<bash-stdout", "<bash-stderr", "<task-notification", "<system-reminder",
-                 "[Request interrupted", "Caveat:")
+                 "[Request interrupted", "Caveat:", "<teammate-message", "<cross-session-message",
+                 "Another Claude session sent a message")
 
 
 VERBS = {"get", "list", "search", "read", "fetch", "find", "query", "create", "update", "delete", "send", "add",
@@ -79,6 +80,16 @@ def is_typed_prompt(d, text):
     if d.get("isMeta") or d.get("toolUseResult") or d.get("tool_use_result") or d.get("isSidechain"): return False
     t = text.lstrip()
     return bool(t) and not t.startswith(SKIP_PREFIXES) and "This session is being continued" not in t
+
+
+def headless(f):
+    """A run started by a script or a schedule (claude -p, the Agent SDK), where nobody typed the prompts.
+    Its subagents carry the same entrypoint."""
+    for line in open(f, encoding="utf-8", errors="ignore"):
+        if '"entrypoint"' not in line: continue
+        try: return (json.loads(line).get("entrypoint") or "").startswith("sdk")
+        except ValueError: continue
+    return False
 
 
 def model_name(m):
@@ -241,6 +252,7 @@ def main():
     logs += [(f, os.path.basename(os.path.dirname(f)), False, True)
              for f in glob.glob(os.path.join(a.cowork, "**", "audit.jsonl"), recursive=True)]
     for f, sid, is_sub, cowork in logs:
+        if not cowork and headless(f): continue
         counted = sid not in others and (only is None or sid in only or (cowork and bool(a.history)))
         S = sessions.setdefault(sid, {"prompts": [], "calls": []})
         calls = collections.OrderedDict(); last_prompt = None
