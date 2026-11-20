@@ -246,5 +246,27 @@
         }
       ]
     }
+  ],
+  "left_out": [
+    {
+      "card": "Drafting code changes and pull requests on GitHub",
+      "example": {
+        "text": "[a colleague]'s change broke the build again… find out how it got through review and who approved it",
+        "apps": [
+          "GitHub"
+        ]
+      },
+      "why": "Blame aimed at a colleague"
+    },
+    {
+      "card": "Looking into things and answering questions",
+      "example": {
+        "text": "read the incident report from last night's outage and tell me what to put in the customer update",
+        "apps": [
+          "Notion"
+        ]
+      },
+      "why": "Incident reports are confidential under your data policy"
+    }
   ]
 }

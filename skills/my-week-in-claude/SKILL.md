@@ -35,7 +35,7 @@ question, copied exactly.
 > copy, plus five ideas for working better that stay in this chat. I read your week from the
 > session logs on this machine, take out names and private details, and follow any AI policy that
 > applies to you. Nothing is posted anywhere. It takes about 5 minutes, and uses about as many
-> tokens as a longish conversation. (v1.0.18)
+> tokens as a longish conversation. (v1.0.19)
 
 The options are "Start" and "Not now". Wait for "Start" before anything else, the checks below
 included.
@@ -134,7 +134,7 @@ out, naming the rule.
 ## 2. Write and redact the card
 
 Read all of `prompts.json`, in parts if it is too long for one read, and write `cards.json` in the shape of `examples/cards.json`: `name`, `cards` (each with `title`,
-`places`, `moved` and `examples`), `personas`, `persona` and `firsts`. The image is one card, and
+`places`, `moved` and `examples`), `personas`, `persona`, `firsts` and `left_out`. The image is one card, and
 each entry in `cards` is a section on it. This step takes the most judgement.
 
 - **One section per place the work went**, largest first. Merge two places into one section when they
@@ -251,6 +251,12 @@ Take the whole prompt out when it touches:
 - unfixed security weaknesses
 - the author's personal life, or when and how long they work
 
+Put every prompt you take out, for this list or for a policy in step 1, in `left_out`, one entry
+each: `{"card", "example", "why"}`. `card` is the title of the section it would go in, `example`
+is the example as it would read on the card, redacted with the table below, and `why` names the
+rule or the policy that took it out, in a few words. Edit mode lists them, and the person can
+bring one back.
+
 Replace, and keep the rest:
 
 | Found | Becomes |
@@ -332,7 +338,7 @@ List every example on the image, section by section. Then give the AI policies:
   any policy that applies to them before sharing.
 
 Then open edit mode, an optional page on this machine only where they can change the card
-themselves. The image and the PDF from step 5 are already final, so the run is finished whether
+themselves. The image and the PDF from step 5 are already saved, so the run is finished whether
 they use it, close it or ignore it. Run this in the background:
 
 ```sh
@@ -343,10 +349,10 @@ It opens the page in their browser and prints its address, and it stops by itsel
 been open for 10 minutes. Close your reply with the links to the image and the PDF, the edit-mode
 link, and one line saying what they can do there: flick between the personas, vote on them or ask for more, turn the persona
 off, give each example a thumbs up or down, ask for one to be anonymised further, leave a note on any of them, remove one
-or add more (up to 10 a section), hide a whole section, and go back to any earlier version or
+or add more (up to 10 a section), bring back a prompt you left out, hide a whole section, and go back to any earlier version or
 compare two side by side. Their changes reach you when they press "Send to Claude", and "I'm happy
-with it" finishes. Say that it's optional: they can close it and keep the card as it is, or tell
-you in the chat instead.
+with it" finishes. End with this line, as it is: "Your image and PDF are already saved, so edit
+mode is optional. Close the tab whenever you like, or ask me for changes here."
 
 Wait for them, in the background as well, so the chat stays free:
 
@@ -354,8 +360,8 @@ Wait for them, in the background as well, so the chat stays free:
 python3 "${CLAUDE_SKILL_DIR}/scripts/edit.py" <work dir> --wait
 ```
 
-It prints what they sent, as JSON. The persona they picked, anything they removed and any section
-they hid are already in `cards.json`. Work through `requests`, following step 2's rules and
+It prints what they sent, as JSON. The persona they picked, anything they removed, any section
+they hid and any prompt they brought back from `left_out` are already in `cards.json`. Work through `requests`, following step 2's rules and
 redacting as before:
 
 - `replace`: swap that example for another prompt in the same section, more like the ones in `liked`.

@@ -106,6 +106,9 @@ def apply(work, body):
     room = MAX_PERSONAS - len(ps)
     if body.get("morePersonas") and room > 0: requests.append({"do": "more_personas", "count": min(MORE_PERSONAS, room)})
 
+    left = c.get("left_out", [])
+    bring = sorted({int(i) for i in body.get("bringIn", []) if 0 <= int(i) < len(left)})
+    taken = []
     content = 0
     for ci, card in enumerate(c["cards"]):
         hidden = sections.get(f"card:{ci}", bool(card.get("hidden")))
@@ -118,6 +121,9 @@ def apply(work, body):
             kept.append(q)
             if hidden: continue
             asks(m, {"card": card["title"], "card_index": ci, "example_index": len(kept) - 1, "text": text(q)}, requests, liked)
+        mine = [i for i in bring if left[i].get("card") == card["title"]][:max(0, MAX_EXAMPLES - len(kept))]
+        taken += mine
+        kept += [left[i]["example"] for i in mine]
         out["cards"][ci]["examples"] = kept
         if hidden: continue
         adds = body.get("adds", {}).get(str(ci), [])[:max(0, MAX_EXAMPLES - len(kept))]
@@ -125,6 +131,7 @@ def apply(work, body):
             requests.append({"do": "add", "card": card["title"], "card_index": ci, **({"hint": h} if h else {})})
         content += len(kept) + len(adds)
 
+    if taken: out["left_out"] = [x for i, x in enumerate(left) if i not in taken]
     hide_firsts = sections.get("firsts", bool(c.get("firsts_hidden")))
     if hide_firsts: out["firsts_hidden"] = True
     else: out.pop("firsts_hidden", None)
@@ -171,6 +178,7 @@ def diff(prev, cur, fb=None):
     ch = {"items": {}, "firsts": {}, "cards": {}, "removed": {}, "persona": None, "newPersonas": {}, "firstsSection": None,
           "note": bool((fb.get("note") or "").strip())}
     before = {card["title"]: (pi, card) for pi, card in enumerate(prev["cards"])}
+    back = {text(x["example"]) for x in prev.get("left_out", [])}
     for ci, card in enumerate(cur["cards"]):
         if card["title"] not in before: ch["cards"][ci] = "new"; continue
         pi, pc = before[card["title"]]
@@ -180,7 +188,9 @@ def diff(prev, cur, fb=None):
                    if t not in now and not marks.get(f"ex:{pi}:{ei}", {}).get("deleted")]
         rewritten = len(sources)
         sources += [{"how": "added", **({"said": h} if h else {})} for h in adds.get(str(pi), [])]
-        new = [ei for ei, t in enumerate(now) if t not in was]
+        new = [ei for ei, t in enumerate(now) if t not in was and t not in back]
+        for ei, t in enumerate(now):
+            if t not in was and t in back: ch["items"][f"{ci}:{ei}"] = {"how": "broughtIn"}
         for ei, x in match(new, sources).items(): ch["items"][f"{ci}:{ei}"] = x
         gone = len([t for t in was if t not in now]) - min(rewritten, len(new))
         if gone: ch["removed"][ci] = gone
@@ -220,6 +230,9 @@ def page(work, n, latest, embed=None):
     err = wpath(work, "error.json")
     state = {"version": n, "latest": latest, "embed": embed, "personas": personas(c),
              "persona": next((i for i, p in enumerate(personas(c)) if c.get("persona") and p["name"] == c["persona"]["name"]), None),
+             "leftOut": [{"text": text(x["example"]), "why": x.get("why", ""), "card": x.get("card"),
+                          "ci": next((i for i, card in enumerate(c["cards"]) if card["title"] == x.get("card")), None)}
+                         for x in c.get("left_out", [])],
              "max": MAX_EXAMPLES, "maxPersonas": MAX_PERSONAS, "more": MORE_PERSONAS, "label": m.get("label", ""),
              "feedback": load(fbpath(work, n)) if os.path.exists(fbpath(work, n)) else None, "changes": changes,
              "error": load(err).get("message") if os.path.exists(err) else None,

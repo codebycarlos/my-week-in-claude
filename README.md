@@ -47,8 +47,8 @@ the my-week-in-claude plugin.
 - **Five ideas.** Claude also suggests five ways to work better, based on your week:
   a skill for something you keep repeating, a connector you have but don't use, and so on.
 - **An optional final check, in edit mode.** Claude opens the card in your browser. Vote on prompts
-  and personas, leave notes, add, remove or hide, and compare versions with a slider. Close it or
-  ignore it and your card stays as it is.
+  and personas, leave notes, add, remove or hide, bring back a prompt Claude left out, and compare
+  versions with a slider. Close it or ignore it and your card stays as it is.
 
 ## How it works
 

@@ -74,9 +74,22 @@ body.ed-ro .ed-ph .ed-i{display:none}
 .ed-pcm{flex-basis:100%}
 .ed-pcm input{background:#262624;color:#faf9f5;border-color:#5a4a42}
 body.ed-ro .ed-cmt input{border-style:dashed}
+.ed-safe{color:#b0aea5;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ed-left{margin:48px auto 0;font-family:Poppins,sans-serif;color:#e8e6dc;background:#262624;border:1px solid #3a3935;border-radius:16px;padding:22px 26px}
+.ed-left h2{margin:0 0 4px;font-size:17px;font-weight:600;color:#faf9f5}
+.ed-left-sub{margin:0 0 14px;font-size:13px;color:#b0aea5}
+.ed-left-row{display:flex;gap:16px;align-items:center;padding:12px 0;border-top:1px solid #3a3935}
+.ed-left-main{flex:1;min-width:0}
+.ed-left-q{font-family:Lora,serif;font-style:italic;font-size:15px;color:#faf9f5}
+.ed-left-why,.ed-left-where{font-size:12.5px;color:#b0aea5;margin-top:4px}
+.ed-left-why b{color:#e8a58c;font-weight:600}
+.ed-left .ed-btn[aria-pressed=true]{background:#2f7a5f;color:#fff}
+body.ed-ro .ed-left .ed-btn{pointer-events:none}
+body.ed-ro .ed-left .ed-btn:not([aria-pressed=true]){display:none}
 </style>
 <div class=ed-bar role=toolbar aria-label="Edit your card">
   <span class=ed-title><svg viewBox="0 0 24 24" width=18 height=18 fill="#D97757"><circle cx=12 cy=12 r=5 /></svg>Edit mode</span>
+  <span class=ed-safe>Your image and PDF are saved. Closing this tab is fine.</span>
   <select id=ed-version aria-label="Version"></select>
   <button class=ed-btn id=ed-restore hidden>Carry on from this version</button>
   <span class=ed-gap></span>
@@ -93,6 +106,8 @@ const old = E.version !== E.latest, readonly = old || !!E.embed;
 const send = $('#ed-send'), happy = $('#ed-happy'), note = $('#ed-note'), msg = $('#ed-msg'), sel = $('#ed-version');
 const marks = {}, painters = {}, adds = {}, addFns = {}, sections = {}, startSections = {}, secPainters = {}, personaVotes = {}, personaComments = {};
 let persona = E.persona, morePersonas = false, showPersona = () => {}, isBusy = false, ready = false;
+const bringIn = new Set(), leftRows = [];
+let paintLeft = () => {};
 const KEY = 'ed-pending-' + E.version;
 const ICON = {
   up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12M15 5.9 14 10h5.8a2 2 0 0 1 2 2.3l-1.4 8A2 2 0 0 1 18.4 22H7V10l4-8a3 3 0 0 1 4 3.9Z"/></svg>',
@@ -241,13 +256,39 @@ if (E.personas.length && pBox){
   pc.append(prev, label, next, up, down, cm.btn, more, tags, cm.box); pBox.after(none, pc); show();
 }
 
+/* Prompts Claude left out of the card */
+if (E.leftOut.length){
+  const box = el('section', 'ed-left'); box.setAttribute('aria-label', 'Left out of the card');
+  box.append(el('h2', '', 'Left out of the card'),
+    el('p', 'ed-left-sub', 'Claude took these prompts out, for the reason under each one. Bring one in and it goes on the card as it reads here.'));
+  E.leftOut.forEach((x, i) => {
+    const row = el('div', 'ed-left-row'), main = el('div', 'ed-left-main'), why = el('div', 'ed-left-why');
+    why.append(el('b', '', 'Why: '), x.why);
+    main.append(el('div', 'ed-left-q', x.text), why,
+      el('div', 'ed-left-where', x.ci == null ? 'Its section isn’t on the card, so it can’t go back in.' : `Goes in “${x.card}”`));
+    const b = el('button', 'ed-btn'); b.type = 'button';
+    b.onclick = () => { bringIn.has(i) ? bringIn.delete(i) : bringIn.add(i); paintLeft(); };
+    row.append(main, b); box.append(row); leftRows.push({b, x, i});
+  });
+  const w = $('#w'); box.style.width = w.offsetWidth + 'px'; box.style.boxSizing = 'border-box'; w.after(box);
+  paintLeft = () => {
+    leftRows.forEach(({b, i}) => {
+      const on = bringIn.has(i); b.setAttribute('aria-pressed', on);
+      b.textContent = on ? (readonly ? 'You brought it in' : '✓ Goes on the card when you send') : 'Bring it in';
+    });
+    refresh();
+  };
+  paintLeft();
+}
+const broughtTo = ci => leftRows.filter(r => bringIn.has(r.i) && r.x.ci == ci).length;
+
 /* Toolbar state */
 note.oninput = () => refresh();
 function content(){
   let n = 0;
   $$('.card[data-card]').forEach(card => {
     const ci = card.dataset.card; if (sections[`card:${ci}`]) return;
-    n += [...card.querySelectorAll('li[data-ex]')].filter(li => !marks[`ex:${ci}:${li.dataset.ex}`]?.deleted).length + adds[ci].length;
+    n += [...card.querySelectorAll('li[data-ex]')].filter(li => !marks[`ex:${ci}:${li.dataset.ex}`]?.deleted).length + adds[ci].length + broughtTo(ci);
   });
   if (firstsBox && !sections.firsts) n += $$('.first[data-first]').filter(f => !marks[`first:${f.dataset.first}`]?.deleted).length;
   return n;
@@ -263,7 +304,7 @@ function changeCount(){
     + Object.values(personaComments).filter(c => (c || '').trim()).length
     + Object.values(adds).reduce((a, x) => a + x.length, 0) + (persona !== E.persona) + !!note.value.trim()
     + Object.keys(sections).filter(k => sections[k] !== startSections[k]).length
-    + Object.values(personaVotes).filter(Boolean).length + morePersonas;
+    + Object.values(personaVotes).filter(Boolean).length + morePersonas + bringIn.size;
 }
 function refresh(){
   if (!ready) return;
@@ -277,8 +318,15 @@ function refresh(){
   $$('.card[data-card]').forEach(card => {
     const ci = card.dataset.card;
     const kept = [...card.querySelectorAll('li[data-ex]')].filter(li => !marks[`ex:${ci}:${li.dataset.ex}`]?.deleted).length;
-    const isFull = kept + adds[ci].length >= E.max;
+    const isFull = kept + adds[ci].length + broughtTo(ci) >= E.max;
     card._add.disabled = isFull; card._add.title = isFull ? `Up to ${E.max} examples per section` : '';
+  });
+  leftRows.forEach(({b, x, i}) => {
+    const card = x.ci == null ? null : $(`.card[data-card="${x.ci}"]`);
+    const kept = card ? [...card.querySelectorAll('li[data-ex]')].filter(li => !marks[`ex:${x.ci}:${li.dataset.ex}`]?.deleted).length : 0;
+    const full = card && kept + adds[x.ci].length + broughtTo(x.ci) >= E.max;
+    b.disabled = !bringIn.has(i) && (!card || full);
+    b.title = !card ? 'Its section isn’t on the card' : full && !bringIn.has(i) ? `Up to ${E.max} examples per section` : '';
   });
 }
 
@@ -290,12 +338,13 @@ function restore(p){
   Object.entries(p.sections || {}).forEach(([k, v]) => { if (k in sections){ sections[k] = v; secPainters[k](); } });
   Object.assign(personaVotes, p.personaVotes || {}); Object.assign(personaComments, p.personaComments || {}); morePersonas = !!p.morePersonas;
   if ('persona' in p) persona = p.persona;
-  note.value = p.note || ''; showPersona(); refresh();
+  (p.bringIn || []).forEach(i => bringIn.add(i));
+  note.value = p.note || ''; showPersona(); paintLeft(); refresh();
 }
 
 function body(done){
   const a = {}; Object.entries(adds).forEach(([k, v]) => { if (v.length) a[k] = v.map(x => x.hint.trim()); });
-  return {version: E.version, persona, items: marks, adds: a, sections, personaVotes, personaComments, morePersonas, note: note.value, done};
+  return {version: E.version, persona, items: marks, adds: a, sections, personaVotes, personaComments, morePersonas, bringIn: [...bringIn], note: note.value, done};
 }
 async function post(path, data){
   let r;
@@ -356,13 +405,14 @@ sel.onchange = () => { location.href = sel.value == E.latest ? '/' : `/?v=${sel.
 
 function quote(s){ return `“${s.length > 36 ? s.slice(0, 35).trim() + '…' : s}”`; }
 function changeLabel(x, isPersona){
+  if (x.how === 'broughtIn') return 'Brought in, as you asked';
   if (x.how === 'changed') return E.changes.note ? 'Changed for your note' : isPersona ? 'Added' : 'Changed by Claude';
   const verb = {swapped: isPersona ? 'Rewritten' : 'Swapped', anonymised: 'Anonymised', rewritten: 'Rewritten', added: 'Added'}[x.how];
   return x.said ? `${verb} for ${quote(x.said)}` : `${verb}, as you asked`;
 }
 function whyTitle(x){
   const asked = {swapped: 'You gave it a thumbs down', anonymised: 'You asked for it to be anonymised further',
-    rewritten: 'You left a note on it', added: 'You asked for one more', changed: E.changes.note ? 'Claude changed it for your note' : 'Claude changed it'}[x.how];
+    rewritten: 'You left a note on it', added: 'You asked for one more', broughtIn: 'You brought it in from the prompts Claude left out', changed: E.changes.note ? 'Claude changed it for your note' : 'Claude changed it'}[x.how];
   return x.said ? `${asked}: “${x.said}”` : asked;
 }
 function newTag(item, x){
