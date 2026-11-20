@@ -4,6 +4,8 @@ Spotify Wrapped for Claude. Your week as a shareable image and PDF, with real pr
 
 ![An example "My week in Claude" image](skills/my-week-in-claude/examples/my-week-in-claude.png)
 
+The same example as a PDF: [my-week-in-claude.pdf](skills/my-week-in-claude/examples/my-week-in-claude.pdf)
+
 ## Install
 
 In Claude Code, in a terminal or the desktop app's Code tab, ask Claude:

@@ -15,7 +15,7 @@ things matter above everything else:
 The image and the PDF hold the same page, and "the image" below means both. The PDF lets
 readers select and copy the prompts. The image shows shares of the week, never totals, so nobody compares how much anyone used. The
 person also gets five ideas for working better, in the chat only. `examples/` holds a finished
-image and the `stats.json` and `cards.json` it was made from.
+image and PDF, and the `stats.json` and `cards.json` it was made from.
 
 Everything is read from the Claude Code session logs on this machine, Cowork's included. Nothing
 is uploaded anywhere else.
@@ -35,7 +35,7 @@ question, copied exactly.
 > copy, plus five ideas for working better that stay in this chat. I read your week from the
 > session logs on this machine, take out names and private details, and follow any AI policy that
 > applies to you. Nothing is posted anywhere. It takes 5 to 15 minutes, and uses about as many
-> tokens as a longish conversation. (v1.0.12)
+> tokens as a longish conversation. (v1.0.13)
 
 The options are "Start" and "Not now". Wait for "Start" before anything else, the checks below
 included.
