@@ -368,6 +368,8 @@ redacting as before:
 - `anonymise`: rewrite it so it says less: drop any detail that could point to the person, a
   colleague or the company, keeping the idea a reader could copy.
 - `add`: add one more example to the section, following `hint` where there is one.
+- `add_section`: they brought back a left-out prompt whose section is not on the card. Add a
+  section titled `card` holding `example`, with `places` and `moved` set as step 2 says.
 - `replace_persona`: rewrite that persona in `personas` with step 2's persona method, in the
   direction of any persona in `liked`.
 - `more_personas`: write `count` new personas the same way and append them to `personas`.

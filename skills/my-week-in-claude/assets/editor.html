@@ -265,16 +265,16 @@ if (E.leftOut.length){
     const row = el('div', 'ed-left-row'), main = el('div', 'ed-left-main'), why = el('div', 'ed-left-why');
     why.append(el('b', '', 'Why: '), x.why);
     main.append(el('div', 'ed-left-q', x.text), why,
-      el('div', 'ed-left-where', x.ci == null ? 'Its section isn’t on the card, so it can’t go back in.' : `Goes in “${x.card}”`));
+      el('div', 'ed-left-where', x.ci == null ? `Claude adds a section for it: “${x.card}”` : `Goes in “${x.card}”`));
     const b = el('button', 'ed-btn'); b.type = 'button';
     b.onclick = () => { bringIn.has(i) ? bringIn.delete(i) : bringIn.add(i); paintLeft(); };
     row.append(main, b); box.append(row); leftRows.push({b, x, i});
   });
   const w = $('#w'); box.style.width = w.offsetWidth + 'px'; box.style.boxSizing = 'border-box'; w.after(box);
   paintLeft = () => {
-    leftRows.forEach(({b, i}) => {
+    leftRows.forEach(({b, x, i}) => {
       const on = bringIn.has(i); b.setAttribute('aria-pressed', on);
-      b.textContent = on ? (readonly ? 'You brought it in' : '✓ Goes on the card when you send') : 'Bring it in';
+      b.textContent = on ? (readonly ? 'You brought it in' : x.ci == null ? '✓ Claude adds it when you send' : '✓ Goes on the card when you send') : 'Bring it in';
     });
     refresh();
   };
@@ -290,6 +290,7 @@ function content(){
     const ci = card.dataset.card; if (sections[`card:${ci}`]) return;
     n += [...card.querySelectorAll('li[data-ex]')].filter(li => !marks[`ex:${ci}:${li.dataset.ex}`]?.deleted).length + adds[ci].length + broughtTo(ci);
   });
+  n += leftRows.filter(r => bringIn.has(r.i) && r.x.ci == null).length;
   if (firstsBox && !sections.firsts) n += $$('.first[data-first]').filter(f => !marks[`first:${f.dataset.first}`]?.deleted).length;
   return n;
 }
@@ -297,7 +298,7 @@ function needsClaude(){
   return Object.values(marks).some(m => !m.deleted && (m.vote === 'down' || m.anonymise || (m.comment || '').trim()))
     || Object.values(personaComments).some(c => (c || '').trim())
     || Object.values(adds).some(a => a.length) || !!note.value.trim() || morePersonas
-    || Object.values(personaVotes).includes('down');
+    || Object.values(personaVotes).includes('down') || leftRows.some(r => bringIn.has(r.i) && r.x.ci == null);
 }
 function changeCount(){
   return Object.values(marks).filter(m => m.deleted || m.vote || m.anonymise || (m.comment || '').trim()).length
@@ -325,8 +326,8 @@ function refresh(){
     const card = x.ci == null ? null : $(`.card[data-card="${x.ci}"]`);
     const kept = card ? [...card.querySelectorAll('li[data-ex]')].filter(li => !marks[`ex:${x.ci}:${li.dataset.ex}`]?.deleted).length : 0;
     const full = card && kept + adds[x.ci].length + broughtTo(x.ci) >= E.max;
-    b.disabled = !bringIn.has(i) && (!card || full);
-    b.title = !card ? 'Its section isn’t on the card' : full && !bringIn.has(i) ? `Up to ${E.max} examples per section` : '';
+    b.disabled = !bringIn.has(i) && !!full;
+    b.title = full && !bringIn.has(i) ? `Up to ${E.max} examples per section` : '';
   });
 }
 

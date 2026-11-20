@@ -131,6 +131,11 @@ def apply(work, body):
             requests.append({"do": "add", "card": card["title"], "card_index": ci, **({"hint": h} if h else {})})
         content += len(kept) + len(adds)
 
+    titles = [card["title"] for card in c["cards"]]
+    for i in bring:
+        if left[i].get("card") in titles: continue
+        taken.append(i); content += 1
+        requests.append({"do": "add_section", "card": left[i].get("card"), "example": left[i]["example"], "why": left[i].get("why", "")})
     if taken: out["left_out"] = [x for i, x in enumerate(left) if i not in taken]
     hide_firsts = sections.get("firsts", bool(c.get("firsts_hidden")))
     if hide_firsts: out["firsts_hidden"] = True
