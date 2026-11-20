@@ -117,11 +117,14 @@ def possible_names(cards, firsts=(), persona=None):
     try: words = [w.strip() for w in open("/usr/share/dict/words", encoding="utf-8", errors="ignore")]
     except OSError: words = []
     proper = {w.lower() for w in words if w[:1].isupper()} - {w for w in words if w[:1].islower()}
+    proper |= {w.strip() for w in open(os.path.join(ASSETS, "names.txt"), encoding="utf-8")}
     apps = {w for card in cards for q in card["examples"] if isinstance(q, dict)
             for a in q.get("apps", []) if isinstance(a, str) or not a.get("colour")
             if '<rect x="1"' not in find_icon(a if isinstance(a, str) else a["name"])
             for w in (a if isinstance(a, str) else a["name"]).split()}
     texts = [(card["title"], card["title"]) for card in cards]
+    texts += [(a["name"] if isinstance(a, dict) else a, "App") for card in cards for q in card["examples"] if isinstance(q, dict)
+              for a in q.get("apps", []) if '<rect x="1"' in find_icon(a if isinstance(a, str) else a["name"])]
     texts += [(q if isinstance(q, str) else q["text"], card["title"]) for card in cards for q in card["examples"]]
     texts += [(persona.get(k, ""), "Persona") for k in ("name", "line")] if persona else []
     texts += [(f.get(k, ""), "New this week") for f in firsts for k in ("name", "detail", "example")]
@@ -144,7 +147,8 @@ def write_page(out, page, why):
     """No working browser, as in some chat sandboxes: hand over the page itself."""
     html_out = os.path.splitext(os.path.abspath(out))[0] + ".html"
     open(html_out, "w", encoding="utf-8").write(page)
-    print(f"No Chrome, Chromium or Playwright here ({why}), so wrote the page instead: {html_out}")
+    print(f"Drawing the image needs Google Chrome, which isn't working here ({why}). Install it from "
+          f"https://www.google.com/chrome/ and run this again. The page is saved meanwhile: {html_out}")
 
 
 def build_page(s, c, prompts, template=os.path.join(ASSETS, "template.html"), edit=False):
@@ -196,13 +200,12 @@ def build_page(s, c, prompts, template=os.path.join(ASSETS, "template.html"), ed
     footer = (f'<div style="margin-bottom:4px">{html.escape(footer[0])}</div>' + "".join(
         f'<span style="display:inline-block;white-space:nowrap;margin:0 9px">{html.escape(x)}</span>' for x in footer[1:]))
     page = open(template, encoding="utf-8").read()
-    for k, v in {"{name}": f"<h1>{html.escape(short_name(c['name']))}</h1>" if c.get("name") else "",
-                 "{logo}": f'<svg viewBox="0 0 24 24" width=20 height=20 fill="#D97757"><path d="{logo}"/></svg>',
-                 "{title}": html.escape(c.get("title", "My week in Claude")),
-                 "{sub}": sub, "{span}": span(s['since'], s['until']), "{persona}": persona_html, "{firsts}": firsts_html,
-                 "{footer}": footer, "{note}": html.escape(c.get("note", NOTE)), "{models}": models_html(s["models"]), "{cards}": cards}.items():
-        page = page.replace(k, v)
-    return page
+    slots = {"{name}": f"<h1>{html.escape(short_name(c['name']))}</h1>" if c.get("name") else "",
+             "{logo}": f'<svg viewBox="0 0 24 24" width=20 height=20 fill="#D97757"><path d="{logo}"/></svg>',
+             "{title}": html.escape(c.get("title", "My week in Claude")),
+             "{sub}": sub, "{span}": span(s['since'], s['until']), "{persona}": persona_html, "{firsts}": firsts_html,
+             "{footer}": footer, "{note}": html.escape(c.get("note", NOTE)), "{models}": models_html(s["models"]), "{cards}": cards}
+    return re.sub(r"\{\w+\}", lambda m: slots.get(m.group(0), m.group(0)), page)
 
 
 def load_prompts(stats_path):

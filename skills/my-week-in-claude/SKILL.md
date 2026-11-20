@@ -296,7 +296,9 @@ earlier weeks are kept. The folder holds a PNG and a PDF of the same name. It pr
 path, then the PDF's, then the folder's last. When you render again in step 6, pass the folder
 with `--out` so the run keeps one folder.
 
-It uses Google Chrome or Chromium, and an internet connection for the fonts and app logos. Open
+It uses Google Chrome or Chromium, and an internet connection for the fonts and app logos. If
+it says it needs Google Chrome, tell the person to install it from the link it gives and ask you
+again, and stop there. Otherwise open
 the PNG and read it: every example has its app logos, no quote runs past three lines, and nothing the redaction
 should have caught got through.
 
