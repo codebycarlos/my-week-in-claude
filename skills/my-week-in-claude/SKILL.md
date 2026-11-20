@@ -121,13 +121,19 @@ can reach (Notion, Confluence, Google Drive, SharePoint) for "AI policy" or "AI 
 what you find, pages it links to included. Keep the title and link of each policy you check the
 prompts against. If you find none, carry on without one and warn the person at the end.
 
-Leave out any prompt that shows a use the policy rules out or limits, such as:
+Leave out a prompt only when the policy rules out what it shows, and name the rule. Judge the
+prompt as it will read after step 2's redaction, against two tests:
 
-- customer content, personal or health data, or confidential figures given to Claude
-- secrets or security findings pasted in
-- an AI tool the policy has not approved
+- **A use the policy forbids**: data the policy says must not go into this tool, such as customer
+  content or health data where Claude is not approved for it, secrets or security findings pasted
+  in, or an AI tool the policy has not approved. Where the policy allows the data in an approved
+  tool, using it is fine.
+- **Content the policy says not to share**: the redacted text still gives away something
+  confidential, such as a figure, what a plan says or what happened in an incident.
 
-Follow the policy's rules on what may be shared, too. In step 6, show the prompts you left out
+A prompt that only mentions confidential work stays. "Read the incident report and draft the
+customer update" and "turn [the goal] into a one-page plan" share nothing once redacted. Where
+redacting a detail is enough, redact it and keep the prompt. In step 6, show the prompts you left out
 for the policy in a table, one row each: what the prompt was about, and why the policy rules it
 out, naming the rule.
 

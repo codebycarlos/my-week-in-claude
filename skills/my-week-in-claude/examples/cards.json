@@ -261,12 +261,10 @@
     {
       "card": "Looking into things and answering questions",
       "example": {
-        "text": "read the incident report from last night's outage and tell me what to put in the customer update",
-        "apps": [
-          "Notion"
-        ]
+        "text": "[customer's medical notes, pasted in] summarise these and suggest what to say on the call",
+        "apps": []
       },
-      "why": "Incident reports are confidential under your data policy"
+      "why": "Health data given to Claude, which your AI policy rules out"
     }
   ]
 }
