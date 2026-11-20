@@ -1,18 +1,19 @@
 ---
 name: my-week-in-claude
-description: Makes "My week in Claude", a shareable image of a person's last week with Claude, with real prompts and five private ideas. Use for "my week in Claude", a weekly recap or usage wrapped.
+description: Makes "My week in Claude", a shareable image and PDF of a person's last week with Claude, with real prompts and five private ideas. Use for "my week in Claude", a weekly recap or usage wrapped.
 ---
 
 # My week in Claude
 
-Make one image a person can share with anyone, so readers pick up ideas from how they use Claude.
+Make one page a person can share with anyone, as an image and a PDF, so readers pick up ideas from how they use Claude.
 The reader can be anyone, and so can the author. Two
 things matter above everything else:
 
 - **Useful.** A reader should come away with something new to try, in the author's own words.
 - **Safe.** Nothing on the image can embarrass the author, a colleague or the company.
 
-The image shows shares of the week, never totals, so nobody compares how much anyone used. The
+The image and the PDF hold the same page, and "the image" below means both. The PDF lets
+readers select and copy the prompts. The image shows shares of the week, never totals, so nobody compares how much anyone used. The
 person also gets five ideas for working better, in the chat only. `examples/` holds a finished
 image and the `stats.json` and `cards.json` it was made from.
 
@@ -29,12 +30,12 @@ stop.
 Before anything else, ask with the question tool whether to go ahead, with this welcome as the
 question, copied exactly.
 
-> Ready to see your week in Claude? It's like Spotify Wrapped for your last week with Claude. You get one
-> image to share, with a card for each kind of work and your own prompts as examples anyone could
+> Ready to see your week in Claude? It's like Spotify Wrapped for your last week with Claude. You get an
+> image and a PDF to share, with a card for each kind of work and your own prompts as examples anyone could
 > copy, plus five ideas for working better that stay in this chat. I read your week from the
 > session logs on this machine, take out names and private details, and follow any AI policy that
 > applies to you. Nothing is posted anywhere. It takes 5 to 15 minutes, and uses about as many
-> tokens as a longish conversation. (v1.0.11)
+> tokens as a longish conversation. (v1.0.12)
 
 The options are "Start" and "Not now". Wait for "Start" before anything else, the checks below
 included.
@@ -42,7 +43,7 @@ included.
 ## Get everything set up
 
 The scripts need Python 3.9 or newer and nothing else from Python. Rendering needs Google Chrome
-or Chromium, which draws the image in the background, and an internet connection for the fonts and
+or Chromium, which draws the image and the PDF in the background, and an internet connection for the fonts and
 app icons.
 
 Check with `python3 --version`, and look for Chrome or Chromium. To the person, this step is
@@ -227,23 +228,26 @@ description. They can write their own.
 python3 "${CLAUDE_SKILL_DIR}/scripts/render.py" <work dir>/stats.json <work dir>/cards.json
 ```
 
-It saves a new PNG in `~/Downloads/my-week-in-claude/`, named after the week and the time, so
-earlier weeks are kept, and prints its path last. When you render again in step 6, pass that path
-with `--out` so the run keeps one image.
+It makes a new folder in `~/Downloads/my-week-in-claude/`, named after the week and the time, so
+earlier weeks are kept. The folder holds a PNG and a PDF of the same name. It prints the PNG's
+path, then the PDF's, then the folder's last. When you render again in step 6, pass the folder
+with `--out` so the run keeps one folder.
 
 It uses Google Chrome or Chromium, and an internet connection for the fonts and app logos. Open
 the PNG and read it: every example has its app logos, no quote runs past three lines, and nothing the redaction
 should have caught got through.
 
-## 5. Hand over the image and five ideas
+## 5. Hand over the image, the PDF and five ideas
 
 Put the image in front of the person before anything else:
 
 - **Open it for them.** Run `open <png>` on a Mac, `start "" <png>` on Windows or
   `xdg-open <png>` on Linux, so it appears in their image viewer.
-- **Give a link they can click**, on its own line: a markdown link whose text is the file name and
-  whose target is the full path as a `file://` address, such as
-  `[my-week-in-claude-2026-w47-19nov-232511.png](file:///Users/sam/Downloads/my-week-in-claude/my-week-in-claude-2026-w47-19nov-232511.png)`.
+- **Give links they can click**, each on its own line, for the PNG and the PDF: a markdown link
+  whose text is the file name and whose target is the full path as a `file://` address, such as
+  `[my-week-in-claude-2026-w47-19nov-232511.png](file:///Users/sam/Downloads/my-week-in-claude/my-week-in-claude-2026-w47-19nov-232511/my-week-in-claude-2026-w47-19nov-232511.png)`.
+  Say in one line that the image suits a post or a message, and the PDF lets readers copy the
+  prompts. If render.py printed no PDF, give the image alone.
 
 Then give five numbered ideas for working better with Claude, in the chat. Each
 one names what you saw in their week (a number or a short quote), says what to change, and ends
@@ -277,7 +281,7 @@ List every example on the image, card by card. Then give the AI policies:
   any policy that applies to them before sharing.
 
 Then ask with the question tool whether they are
-happy with it: "Happy with it" or "Change something". Repeat the link to the image just above the
+happy with it: "Happy with it" or "Change something". Repeat the links to the image and the PDF just above the
 question, so they know what they are judging.
 
 They may take out a prompt they would rather not share, swap or move one, rename a card or pick

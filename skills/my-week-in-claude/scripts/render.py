@@ -150,14 +150,17 @@ def write_page(out, page, why):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("stats"); ap.add_argument("cards")
-    ap.add_argument("--out", help="PNG path; defaults to a new file named after the week and time")
+    ap.add_argument("--out", help="folder for the PNG and PDF; defaults to a new one named after the week and time")
     ap.add_argument("--template", default=os.path.join(ASSETS, "template.html"))
     a = ap.parse_args()
     s = json.load(open(a.stats, encoding="utf-8")); c = json.load(open(a.cards, encoding="utf-8"))
     if not a.out:
         year, week, _ = dt.date.fromisoformat(s["until"]).isocalendar()
         stamp = dt.datetime.now().strftime("%d%b-%H%M%S").lower()
-        a.out = os.path.join(os.path.expanduser("~/Downloads/my-week-in-claude"), f"my-week-in-claude-{year}-w{week:02d}-{stamp}.png")
+        a.out = os.path.join(os.path.expanduser("~/Downloads/my-week-in-claude"), f"my-week-in-claude-{year}-w{week:02d}-{stamp}")
+    folder = os.path.abspath(a.out)
+    png = os.path.join(folder, os.path.basename(folder) + ".png")
+    pdf = os.path.splitext(png)[0] + ".pdf"
 
     prompts_path = os.path.join(os.path.dirname(os.path.abspath(a.stats)), "prompts.json")
     if not os.path.exists(prompts_path): sys.exit(f"No prompts.json at {prompts_path}: it must sit next to stats.json.")
@@ -207,7 +210,9 @@ def main():
                  "{footer}": html.escape(footer), "{note}": html.escape(c.get("note", NOTE)), "{models}": models_html(s["models"]), "{cards}": cards}.items():
         page = page.replace(k, v)
 
-    os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
+    os.makedirs(folder, exist_ok=True)
+    for f in (png, pdf):
+        if os.path.exists(f): os.remove(f)
     chrome = next((p for p in CHROME if os.path.exists(p) or shutil.which(p)), None)
     if not chrome:
         try:
@@ -216,32 +221,40 @@ def main():
                 browser = pw.chromium.launch()
                 tab = browser.new_page(viewport={"width": 900, "height": 1000}, device_scale_factor=2)
                 tab.set_content(page, wait_until="networkidle")
-                tab.locator("#w").screenshot(path=os.path.abspath(a.out))
+                tab.locator("#w").screenshot(path=png)
+                tab.emulate_media(media="screen")
+                tab.pdf(path=pdf, width="900px", height=f"{tab.title()}px", print_background=True)
                 browser.close()
         except Exception as e:
-            return write_page(a.out, page, str(e).strip().splitlines()[0] if str(e).strip() else type(e).__name__)
+            return write_page(png, page, str(e).strip().splitlines()[0] if str(e).strip() else type(e).__name__)
     else:
         with tempfile.TemporaryDirectory() as tmp:
             page_path = os.path.join(tmp, "page.html"); open(page_path, "w", encoding="utf-8").write(page)
             uri = pathlib.Path(page_path).as_uri()
             flags = [chrome, "--headless=new", "--disable-gpu", "--hide-scrollbars", "--virtual-time-budget=5000"]
             try:
-                if os.path.exists(a.out): os.remove(a.out)
                 dom = subprocess.run(flags + ["--window-size=900,4000", "--dump-dom", uri],
                                      capture_output=True, text=True, encoding="utf-8", errors="ignore", timeout=120).stdout or ""
                 height = re.search(r"<title>(\d+)</title>", dom)
-                if not height: return write_page(a.out, page, f"{chrome} printed no page height")
-                subprocess.run(flags + ["--force-device-scale-factor=2", f"--window-size=900,{height.group(1)}",
-                                        "--screenshot=" + os.path.abspath(a.out), uri],
+                if not height: return write_page(png, page, f"{chrome} printed no page height")
+                h = height.group(1)
+                subprocess.run(flags + ["--force-device-scale-factor=2", f"--window-size=900,{h}",
+                                        "--screenshot=" + png, uri],
+                               capture_output=True, timeout=120)
+                print_css = f"<style>@page{{size:900px {h}px;margin:0}}html,body{{print-color-adjust:exact;-webkit-print-color-adjust:exact}}</style>"
+                open(page_path, "w", encoding="utf-8").write(page.replace("</head>", print_css + "</head>", 1))
+                subprocess.run(flags + [f"--window-size=900,{h}", "--no-pdf-header-footer", "--print-to-pdf=" + pdf, uri],
                                capture_output=True, timeout=120)
             except subprocess.TimeoutExpired:
-                return write_page(a.out, page, f"{chrome} timed out")
-            if not os.path.exists(a.out): return write_page(a.out, page, f"{chrome} wrote no PNG")
+                return write_page(png, page, f"{chrome} timed out")
+            if not os.path.exists(png): return write_page(png, page, f"{chrome} wrote no PNG")
     names = possible_names(c["cards"], [f for f in c.get("firsts", []) if isinstance(f, dict)], c.get("persona"))
     if names:
         print("Check these for names, customers or anything to redact:")
         for w, t in names.items(): print(f"  {w}  ({t})")
-    print(a.out)
+    print(png)
+    print(pdf if os.path.exists(pdf) else "No PDF this time: the browser could not print one.")
+    print(folder)
 
 
 if __name__ == "__main__":
