@@ -25,7 +25,7 @@ logs. Your Cowork work still counts.
 ## Use
 
 In Claude Code, ask for "my week in Claude". It checks with you before it starts, and a run takes
-5 to 15 minutes.
+about 5 minutes.
 
 ## Updates
 

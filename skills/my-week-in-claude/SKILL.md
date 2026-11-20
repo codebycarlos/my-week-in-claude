@@ -34,8 +34,8 @@ question, copied exactly.
 > image and a PDF to share, with a card for each kind of work and your own prompts as examples anyone could
 > copy, plus five ideas for working better that stay in this chat. I read your week from the
 > session logs on this machine, take out names and private details, and follow any AI policy that
-> applies to you. Nothing is posted anywhere. It takes 5 to 15 minutes, and uses about as many
-> tokens as a longish conversation. (v1.0.14)
+> applies to you. Nothing is posted anywhere. It takes about 5 minutes, and uses about as many
+> tokens as a longish conversation. (v1.0.15)
 
 The options are "Start" and "Not now". Wait for "Start" before anything else, the checks below
 included.
