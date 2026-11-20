@@ -258,7 +258,11 @@ def main():
         counted = sid not in others and (only is None or sid in only or (cowork and bool(a.history)))
         S = sessions.setdefault(sid, {"prompts": [], "calls": []})
         calls = collections.OrderedDict(); last_prompt = None
+        # A log last written before the week only adds to what was used before it, which lives in its assistant
+        # turns and slash commands, so skip parsing everything else (most of the bytes are tool results).
+        old = os.path.getmtime(f) < since.timestamp()
         for line in open(f, encoding="utf-8", errors="ignore"):
+            if old and earliest and '"assistant"' not in line and "command-name" not in line: continue
             try: d = json.loads(line)
             except ValueError: continue
             m = d.get("message") or {}
