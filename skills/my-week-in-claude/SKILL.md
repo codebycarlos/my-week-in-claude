@@ -46,7 +46,8 @@ The scripts need Python 3.9 or newer and nothing else from Python. Rendering nee
 or Chromium, which draws the image and the PDF in the background, and an internet connection for the fonts and
 app icons.
 
-Check with `python3 --version`, and look for Chrome or Chromium. To the person, this step is
+Check with `python3 --version`, and look for Chrome or Chromium. On Windows, where `python3`
+is often missing, try `py -3 --version`, and if that works use `py -3` for `python3` in every command here. To the person, this step is
 "Getting everything set up": never name Python, Chrome or any other tool in your updates or task
 list unless one is missing. If something is missing, tell the person what it is and what it is for, and offer to install it
 with the question tool. Install only
