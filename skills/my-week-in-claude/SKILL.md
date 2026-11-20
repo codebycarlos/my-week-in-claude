@@ -223,6 +223,7 @@ Write them in three passes, and put only the three you keep in the file:
    - **The surprise comes last.** Cut anything after the word that makes it funny.
    - **Kind.** It teases a habit they would laugh at themselves. Nothing about their skill, effort
      or judgement, nothing suggesting Claude did their job, nothing on how much or when they used it.
+   - **Work only.** Nothing from a personal or non-work conversation.
    - **No stock shapes.** None of these:
      - an object or idea acting like a person ("Jargon has filed a complaint", "That PR has never
        felt so seen", "The bug didn't stand a chance")
@@ -250,13 +251,19 @@ or account name.
 
 Take the whole prompt out when it touches:
 
-- someone's performance, pay, hiring, leaving, health or personal life
+- someone's performance, pay, promotion, hiring, leaving, health or personal life
 - feelings, disagreements, or blame aimed at a colleague, team or customer
+- the author being unhappy at work, looking for another job, a CV, or a side business
+- the author's own money, or the author putting themselves down
+- religion or beliefs, politics, ethnicity, sexuality or sex life, or trade union membership
 - private remarks between people, such as pet names or jokes at someone's expense
 - who has, needs or was given access to a system
 - legal matters, deals, prices or figures not yet public, funding or restructuring
 - unfixed security weaknesses
-- the author's personal life, or when and how long they work
+- the author's personal life, anything unrelated to work, or when and how long they work
+
+Section titles, `firsts` and the persona never draw on a conversation that is personal or not
+about work, even when the prompt itself would pass.
 
 Put every prompt you take out, for this list or for a policy in step 1, in `left_out`, one entry
 each: `{"card", "example", "why"}`. `card` is the title of the section it would go in, `example`
@@ -278,7 +285,9 @@ Replace, and keep the rest:
 | Pasted text, or a colleague's words typed in | What it was: `[meeting notes, pasted in]`, `[their message]` |
 
 Third-party tools keep their names (Slack, Figma, Excel), since they say nothing about where the
-author works. `render.py` lists every capitalised word that may be a name: check each one.
+author works. Redact again after joining prompts with `→` or trimming with `…`, since a join
+can put two harmless halves together into something this list covers. `render.py` lists every
+word that may be a name: check each one.
 
 ## 3. Pick the persona
 
