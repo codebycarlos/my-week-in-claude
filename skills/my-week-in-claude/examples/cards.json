@@ -3,7 +3,7 @@
   "personas": [
     {
       "name": "The Incident Commander",
-      "line": "Ten agents on a failing build. Five on a bug that might not exist. The entire commit history on tabs versus spaces."
+      "line": "Ten agents on a failing build. The entire commit history on tabs versus spaces."
     },
     {
       "name": "The Second Opinion",
@@ -11,12 +11,12 @@
     },
     {
       "name": "The Slicer",
-      "line": "You split one PR into three, the sign-up flow into a board per step, then every feature into a percentage."
+      "line": "You split one PR into three, sign-up into a board per step, every feature into a percentage."
     }
   ],
   "persona": {
     "name": "The Incident Commander",
-    "line": "Ten agents on a failing build. Five on a bug that might not exist. The entire commit history on tabs versus spaces."
+    "line": "Ten agents on a failing build. The entire commit history on tabs versus spaces."
   },
   "firsts": [
     {

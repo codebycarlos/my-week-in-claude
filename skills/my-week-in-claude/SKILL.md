@@ -197,27 +197,20 @@ that are already funny side by side, put the funniest one last, and stop.
 
 The name is "The" and a role the habit earns, one to three words: a job, never an adjective ("The
 Incident Commander", "The Second Opinion", not "The Efficient One"). The line talks to them as
-"you", under 30 words. Every fact in it is true and comes from their week.
+"you", under 20 words. Every fact in it is true and comes from their week.
 
 Write them in three passes, and put only the three you keep in the file:
 
-1. **Find the material.** List fifteen or more specific things from their week: a number from
+1. **Find the material.** List ten or more specific things from their week: a number from
    `stats.json`, a phrase they kept typing, a request few people would make, two requests days
    apart that clash in size or tone. Skip anything true of most people who use Claude.
-2. **Draft twenty lines**, at least four in each of these shapes:
-   - **Escalation.** Three of their real requests in a row, each sillier than the last, and the
-     silliest one ends the line.
+2. **Draft six lines**, two in each of these shapes:
    - **Clash.** Two true things side by side that should not sit together: ten agents on an outage,
      then the whole commit history on tabs against spaces.
    - **Their words against their week.** A phrase they typed, next to a request or a count that
      really contradicts it. If the contradiction needs explaining, it is not there.
    - **Deadpan.** One true fact strange enough on its own, told flat, with nothing after it.
-
-   For each line, write the first ending that comes to mind, then throw it away and write another:
-   the first one is the one any reader would guess.
-3. **Keep three, from three different habits and at least two different shapes.** If you can start a
-   subagent, give it the twenty lines and the tests below, and keep the three it picks: a reader who
-   did not write them laughs at different ones. Keep a line only if it passes all of these:
+3. **Keep three, from three different habits.** Keep a line only if it passes all of these:
    - **Can't guess the end.** Cover the second half. If you could have written it yourself, cut it.
    - **Only them.** If it would fit most people who use Claude, it is a horoscope.
    - **The surprise comes last.** Cut anything after the word that makes it funny.
@@ -238,8 +231,8 @@ Write them in three passes, and put only the three you keep in the file:
 Two that pass, from `examples/cards.json`. They show the bar, not a template: copy their shape and
 the line reads like theirs, not the person's.
 
-- The Incident Commander (escalation): "Ten agents on a failing build. Five on a bug that might not
-  exist. The entire commit history on tabs versus spaces."
+- The Incident Commander (clash): "Ten agents on a failing build. The entire commit history on tabs
+  versus spaces."
 - The Second Opinion (deadpan): "Before opening your own pull request, you had five agents review it
   from different angles."
 
