@@ -140,6 +140,8 @@ def note(example, key, ts, prompt):
 
 def clean(text):
     text = re.sub(r"<pasted_content[^>]*>.*?</pasted_content[^>]*>", "[pasted]", text, flags=re.S)
+    text = re.sub(r"https?://\S+", "[a link]", text)
+    text = re.sub(r"(?<![\w.])(~/|/Users/|/home/|[A-Za-z]:\\)[^\s\"']*", "[a file]", text)
     return " ".join(text.split())
 
 
@@ -166,7 +168,7 @@ def running_session(root):
     for log in logs:
         with open(log, "rb") as f:
             f.seek(max(0, os.path.getsize(log) - 200_000))
-            if b"scripts/collect.py" in f.read():
+            if re.search(rb"scripts[/\\]+collect\.py", f.read()):
                 return os.path.splitext(os.path.basename(log))[0]
     return None
 
@@ -216,7 +218,7 @@ def main():
     a = ap.parse_args()
 
     until = dt.datetime.now().astimezone()
-    since = (until - dt.timedelta(days=a.days)).replace(hour=0, minute=0, second=0, microsecond=0)
+    since = (until - dt.timedelta(days=a.days - 1)).replace(hour=0, minute=0, second=0, microsecond=0)
     since_s = since.astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
     only = None; others = set()
     root = os.path.normpath(a.projects)
