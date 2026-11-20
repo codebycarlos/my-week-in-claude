@@ -13,7 +13,7 @@ things matter above everything else:
 - **Safe.** Nothing on the image can embarrass the author, a colleague or the company.
 
 The image and the PDF hold the same page, and "the image" below means both. The PDF lets
-readers select and copy the prompts. The image shows shares of the week, never totals, so nobody compares how much anyone used. The
+readers select and copy the prompts. The image never shows token totals, so nobody feels pushed to compete or to use more. The
 person also gets five ideas for working better, in the chat only. `examples/` holds a finished
 image and PDF, and the `stats.json` and `cards.json` it was made from.
 
